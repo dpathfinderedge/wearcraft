@@ -214,37 +214,65 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import Script from 'next/script';
 import { useRouter } from 'next/navigation';
-import { useCartStore, useAuthStore, useOrderStore } from '@/store';
+import { useCartStore, useAuthStore } from '@/store';
 import { CheckoutForm, OrderSummary } from '@/components/checkout';
 import { Button, LoadingOverlay } from '@/components/ui';
 import { AddressInput } from '@/lib/validations';
 import { useToast } from '@/components/ui';
+import { initializePaystackPayment, convertToKobo, getPaystackPublicKey } from '@/lib/paystack';
 import { ShieldCheck } from 'lucide-react';
+import { apiClient } from '@/lib/api-client';
+
+declare global {
+  interface PaystackSuccessResponse {
+    status: string;
+    reference: string;
+    message?: string;
+  }
+
+  interface Window {
+    PaystackPop?: {
+      setup: (config: {
+        key: string;
+        email: string;
+        amount: number;
+        currency: string;
+        ref?: string;
+        onClose: () => void;
+        callback: (response: PaystackSuccessResponse) => void;
+      }) => {
+        openIframe: () => void;
+      };
+    };
+  }
+}
+
+interface PaystackResponse {
+  status: string;
+  reference: string;
+  message?: string;
+}
 
 export default function CheckoutPage() {
   const router = useRouter();
   const { showToast } = useToast();
   const { items, getCartSummary, clearCart } = useCartStore();
   const { user, isAuthenticated } = useAuthStore();
-  const { createOrder } = useOrderStore();
-  
+
   const [shippingAddress, setShippingAddress] = useState<AddressInput | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const [paystackLoaded, setPaystackLoaded] = useState(false);
+  const [shippingSaved, setShippingSaved] = useState(false);
 
   const summary = getCartSummary();
+  const paystackPublicKey = getPaystackPublicKey();
+  const hasValidPaystackKey = paystackPublicKey && paystackPublicKey !== 'pk_test_default_key';
+  const amountInKobo = convertToKobo(summary.total);
 
-  // Wait for component to mount before doing any checks
   useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  // Check authentication and cart only after mounted
-  useEffect(() => {
-    if (!mounted) return;
-
     if (!isAuthenticated) {
       showToast('Please login to continue', 'error');
       router.push('/auth/login?redirect=/checkout');
@@ -254,130 +282,185 @@ export default function CheckoutPage() {
     if (items.length === 0) {
       router.push('/cart');
     }
-  }, [mounted]); // Only run when mounted changes
+  }, [isAuthenticated, items.length, router, showToast]);
 
   const handleFormSubmit = (data: AddressInput) => {
     setShippingAddress(data);
-    showToast('✓ Address saved successfully!', 'success');
+    setShippingSaved(true);
+    showToast('Address saved successfully. You can now complete payment.', 'success');
   };
 
-  const handlePlaceOrder = () => {
+  const createOrder = async (paymentReference?: string) => {
+    if (!user || !shippingAddress) {
+      return { success: false, error: 'Missing user or shipping address' };
+    }
+
+    const orderResponse = await apiClient.createOrder({
+      items: items.map((item) => ({
+        productId: item.product.id,
+        name: item.product.name,
+        price: item.product.price,
+        quantity: item.quantity,
+        size: item.selectedSize,
+        color: item.selectedColor,
+        image: item.product.images[0],
+      })),
+      address: {
+        firstName: shippingAddress.firstName,
+        lastName: shippingAddress.lastName,
+        address: shippingAddress.street,
+        city: shippingAddress.city,
+        state: shippingAddress.state,
+        zipCode: shippingAddress.postalCode,
+        country: shippingAddress.country,
+        phone: shippingAddress.phone,
+      },
+      subtotal: summary.subtotal,
+      shipping: summary.shipping,
+      tax: summary.tax,
+      total: summary.total,
+      paymentMethod: hasValidPaystackKey ? 'paystack' : 'card',
+      paymentReference: paymentReference,
+      notes: paymentReference ? `Paystack reference: ${paymentReference}` : undefined,
+    });
+ 
+    return orderResponse;
+  };
+
+  const handlePaystackSuccess = async (paystackResponse: PaystackResponse) => {
+    setIsProcessing(true);
+
+    try {
+      const verification = await apiClient.verifyPaystackPayment(paystackResponse.reference);
+      if (!verification.success) {
+        throw new Error(verification.error || 'Payment verification failed');
+      }
+
+      const orderResponse = await createOrder(paystackResponse.reference);
+      if (!orderResponse.success || !orderResponse.data) {
+        throw new Error(orderResponse.error || 'Order creation failed after payment');
+      }
+
+      clearCart();
+      router.push(`/order-confirmation?orderId=${orderResponse.data.id}`);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unable to complete payment';
+      showToast(errorMessage, 'error');
+      setIsProcessing(false);
+    }
+  };
+
+  const handlePayment = async () => {
     if (!shippingAddress) {
-      showToast('Please save your shipping address first', 'error');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      showToast('Please save your shipping address before paying.', 'error');
       return;
     }
 
     if (!user) {
-      showToast('Please login to continue', 'error');
+      showToast('Please login to continue.', 'error');
       router.push('/auth/login?redirect=/checkout');
       return;
     }
 
-    setIsProcessing(true);
-
-    // Simulate payment processing (Demo Mode)
-    setTimeout(() => {
-      try {
-        const order = createOrder(
-          user.id,
-          items,
-          {
-            email: user.email,
-            shippingAddress: { ...shippingAddress, id: Date.now().toString() },
-            paymentMethod: 'paystack',
-          },
-          summary
-        );
-
-        clearCart();
-        showToast('Order placed successfully!', 'success');
-        router.push(`/order-confirmation?orderId=${order.id}`);
-      } catch (error) {
-        console.error('Order creation error:', error);
-        showToast('Failed to create order. Please try again.', 'error');
-        setIsProcessing(false);
+    if (hasValidPaystackKey) {
+      if (!paystackLoaded || !window.PaystackPop) {
+        showToast('Payment system is loading, please wait.', 'warning');
+        return;
       }
-    }, 1500);
+
+      initializePaystackPayment({
+        publicKey: paystackPublicKey,
+        email: user.email,
+        amount: amountInKobo,
+        currency: 'NGN',
+        onClose: () => {
+          setIsProcessing(false);
+          showToast('Payment window closed. You can retry when ready.', 'warning');
+        },
+        onSuccess: async (response: PaystackResponse) => {
+          await handlePaystackSuccess(response);
+        },
+      });
+    } else {
+      setIsProcessing(true);
+      const orderResponse = await createOrder();
+      if (!orderResponse.success || !orderResponse.data) {
+        showToast(orderResponse.error || 'Failed to place order', 'error');
+        setIsProcessing(false);
+        return;
+      }
+
+      clearCart();
+      router.push(`/order-confirmation?orderId=${orderResponse.data.id}`);
+    }
   };
 
-  // Don't render anything until mounted to prevent hydration issues
-  if (!mounted) {
+  if (items.length === 0) {
     return null;
-  }
-
-  // Show loading while checking auth (only after mount)
-  if (mounted && (!isAuthenticated || items.length === 0)) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading checkout...</p>
-        </div>
-      </div>
-    );
   }
 
   return (
     <>
+      <Script
+        src="https://js.paystack.co/v1/inline.js"
+        onLoad={() => setPaystackLoaded(true)}
+        onError={() => {
+          showToast('Unable to load PayStack. Demo checkout will still work.', 'warning');
+        }}
+      />
+
       {isProcessing && <LoadingOverlay message="Processing your order..." />}
 
       <div className="min-h-screen bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl md:text-4xl font-light text-gray-900 mb-2">
-              Checkout
-            </h1>
-            <p className="text-gray-600">Complete your purchase</p>
+            <h1 className="text-3xl md:text-4xl font-light text-gray-900 mb-2">Checkout</h1>
+            <p className="text-gray-600">Complete your purchase securely.</p>
           </div>
 
-          {/* Demo Mode Notice */}
-          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-sm">
-            <p className="text-sm text-blue-800">
-              <strong>Demo Mode:</strong> This is a demonstration checkout. Click "Place Order" to complete your test purchase.
-            </p>
-          </div>
+          {!hasValidPaystackKey && (
+            <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-sm text-sm text-yellow-800">
+              <strong>Demo Mode:</strong> PayStack is not configured. You can still place a test order.
+            </div>
+          )}
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Checkout Form */}
-            <div className="lg:col-span-2">
-              <div className="bg-white border border-gray-200 rounded-sm p-6">
-                <CheckoutForm
-                  onSubmit={handleFormSubmit}
-                  defaultValues={{
-                    firstName: '',
-                    lastName: '',
-                    street: '',
-                    city: '',
-                    state: '',
-                    postalCode: '',
-                    country: 'Nigeria',
-                    phone: '',
-                  }}
-                />
+            <div className="lg:col-span-2 bg-white border border-gray-200 rounded-sm p-6">
+              <CheckoutForm
+                onSubmit={handleFormSubmit}
+                defaultValues={{
+                  firstName: shippingAddress?.firstName || '',
+                  lastName: shippingAddress?.lastName || '',
+                  street: shippingAddress?.street || '',
+                  city: shippingAddress?.city || '',
+                  state: shippingAddress?.state || '',
+                  postalCode: shippingAddress?.postalCode || '',
+                  country: shippingAddress?.country || 'Nigeria',
+                  phone: shippingAddress?.phone || '',
+                }}
+                isLoading={isProcessing}
+              />
 
-                {/* Payment Method */}
-                <div className="mt-8 pt-8 border-t border-gray-200">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                    Payment Method
-                  </h3>
-                  <div className="border border-gray-300 rounded-sm p-4 flex items-center gap-3">
-                    <div className="w-12 h-12 bg-gray-100 rounded flex items-center justify-center">
-                      <ShieldCheck size={24} className="text-gray-600" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-gray-900">Demo Payment</p>
-                      <p className="text-sm text-gray-600">
-                        Testing mode - no real payment required
-                      </p>
-                    </div>
+              <div className="mt-8 pt-8 border-t border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Payment Method</h3>
+                <div className="border border-gray-300 rounded-sm p-4 flex items-center gap-3">
+                  <div className="w-12 h-12 bg-gray-100 rounded flex items-center justify-center">
+                    <ShieldCheck size={24} className="text-gray-600" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-900">
+                      {hasValidPaystackKey ? 'PayStack Checkout' : 'Test Checkout'}
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      {hasValidPaystackKey
+                        ? 'Secure payment via PayStack. Your card information stays encrypted.'
+                        : 'Demo sales mode: payment is simulated for testing without a PayStack key.'}
+                    </p>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Order Summary */}
             <div className="lg:col-span-1">
               <div className="sticky top-20 space-y-4">
                 <OrderSummary
@@ -388,13 +471,10 @@ export default function CheckoutPage() {
                   total={summary.total}
                 />
 
-                {shippingAddress && (
+                {shippingSaved && (
                   <div className="p-3 bg-green-50 border border-green-200 rounded-sm">
                     <div className="flex items-center gap-2">
-                      <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      <span className="text-sm font-medium text-green-800">Address saved</span>
+                      <span className="text-sm font-medium text-green-800">Shipping address saved</span>
                     </div>
                   </div>
                 )}
@@ -403,15 +483,15 @@ export default function CheckoutPage() {
                   variant="primary"
                   size="lg"
                   className="w-full"
-                  onClick={handlePlaceOrder}
-                  disabled={isProcessing}
+                  onClick={handlePayment}
+                  disabled={isProcessing || !shippingSaved}
                   isLoading={isProcessing}
                 >
-                  {isProcessing ? 'Processing...' : 'Place Order'}
+                  {isProcessing ? 'Processing...' : hasValidPaystackKey ? `Pay ${summary.total.toFixed(2)}` : 'Place Order'}
                 </Button>
 
                 <p className="text-xs text-center text-gray-500">
-                  By completing your purchase, you agree to our Terms of Service and Privacy Policy
+                  By completing your purchase, you agree to our Terms of Service and Privacy Policy.
                 </p>
               </div>
             </div>
