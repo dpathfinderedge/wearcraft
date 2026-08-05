@@ -31,6 +31,7 @@ const createOrderSchema = z.object({
   tax: z.number(),
   total: z.number(),
   paymentMethod: z.string().optional(),
+  paymentReference: z.string().optional(),
   notes: z.string().optional(),
 });
 
@@ -77,29 +78,37 @@ export async function POST(request: NextRequest) {
     });
 
     // Create order with items
-    const order = await prisma.order.create({
-      data: {
-        orderNumber,
-        userId: authUser.userId,
-        addressId: address.id,
-        subtotal: validatedData.subtotal,
-        shipping: validatedData.shipping,
-        tax: validatedData.tax,
-        total: validatedData.total,
-        paymentMethod: validatedData.paymentMethod || 'paystack',
-        notes: validatedData.notes,
-        items: {
-          create: validatedData.items.map(item => ({
-            productId: item.productId,
-            name: item.name,
-            price: item.price,
-            quantity: item.quantity,
-            size: item.size,
-            color: item.color,
-            image: item.image,
-          })),
-        },
+    const orderData: any = {
+      orderNumber,
+      userId: authUser.userId,
+      addressId: address.id,
+      subtotal: validatedData.subtotal,
+      shipping: validatedData.shipping,
+      tax: validatedData.tax,
+      total: validatedData.total,
+      paymentMethod: validatedData.paymentMethod || 'paystack',
+      notes: validatedData.notes,
+      items: {
+        create: validatedData.items.map((item: any) => ({
+          productId: item.productId,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+          size: item.size,
+          color: item.color,
+          image: item.image,
+        })),
       },
+    };
+
+    // If a payment reference was provided (e.g., after successful Paystack verification), mark as paid
+    if (validatedData.paymentReference) {
+      orderData.paymentRef = validatedData.paymentReference;
+      orderData.paymentStatus = 'PAID';
+    }
+
+    const order = await prisma.order.create({
+      data: orderData,
       include: {
         items: true,
         address: true,
