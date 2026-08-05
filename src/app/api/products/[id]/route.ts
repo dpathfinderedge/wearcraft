@@ -4,7 +4,7 @@ import { successResponse, errorResponse, handleApiError } from '@/lib/api-respon
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
