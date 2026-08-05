@@ -1,30 +1,65 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useAuthStore, useOrderStore } from '@/store';
+import { useAuthStore } from '@/store';
 import { Badge } from '@/components/common';
 import { formatPrice, formatDate } from '@/lib/utils';
 import { Package, ChevronRight } from 'lucide-react';
+import { apiClient } from '@/lib/api-client';
+
+type OrderSummaryItem = {
+  id: string;
+  productId: string;
+  name: string;
+  price: number;
+  quantity: number;
+  size?: string;
+  color?: string;
+  image: string;
+};
+
+type OrderListItem = {
+  id: string;
+  orderNumber: string;
+  total: number;
+  status: string;
+  paymentRef?: string;
+  trackingNumber?: string;
+  createdAt: string;
+  items: OrderSummaryItem[];
+};
 
 export default function OrdersPage() {
   const router = useRouter();
   const { user, isAuthenticated } = useAuthStore();
-  const { getOrdersByUserId } = useOrderStore();
+  const [orders, setOrders] = useState<OrderListItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Redirect if not authenticated
   useEffect(() => {
     if (!isAuthenticated) {
       router.push('/auth/login?redirect=/orders');
+      return;
     }
+
+    const fetchOrders = async () => {
+      const response = await apiClient.getOrders();
+      if (response.success && response.data) {
+        setOrders(response.data as OrderListItem[]);
+      } else {
+        setOrders([]);
+      }
+      setLoading(false);
+    };
+
+    fetchOrders();
   }, [isAuthenticated, router]);
 
   if (!user) {
     return null;
   }
-
-  const orders = getOrdersByUserId(user.id);
 
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
@@ -55,7 +90,11 @@ export default function OrdersPage() {
         </div>
 
         {/* Orders List */}
-        {orders.length === 0 ? (
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-16 text-center">
+            <div className="text-sm text-gray-600">Loading orders...</div>
+          </div>
+        ) : orders.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-6">
               <Package size={40} className="text-gray-400" strokeWidth={1.5} />
@@ -123,15 +162,17 @@ export default function OrdersPage() {
                 {/* Order Items */}
                 <div className="px-6 py-4">
                   <div className="flex items-center gap-4 overflow-x-auto pb-2">
-                    {order.items.slice(0, 4).map((item: any, index: number) => (
+                    {order.items.slice(0, 4).map((item: OrderSummaryItem, index: number) => (
                       <div
                         key={index}
-                        className="flex-shrink-0 w-16 h-20 bg-gray-100 overflow-hidden"
+                        className="relative flex-shrink-0 w-16 h-20 bg-gray-100 overflow-hidden"
                       >
-                        <img
-                          src={item.product.images[0]}
-                          alt={item.product.name}
-                          className="w-full h-full object-cover"
+                        <Image
+                          src={item.image}
+                          alt={item.name}
+                          fill
+                          className="object-cover"
+                          sizes="64px"
                         />
                       </div>
                     ))}
