@@ -1,6 +1,10 @@
 // Frontend API client for making requests to backend
 
-export interface ApiResponse<T = any> {
+import { Address, ApiAddress, ApiUser, UpdateProfileData } from '@/types/user';
+import { ApiOrder } from '@/types/order';
+import { mapAddressToApi } from '@/lib/mappers';
+
+export interface ApiResponse<T = unknown> {
   success: boolean;
   data?: T;
   error?: string;
@@ -51,15 +55,15 @@ class ApiClient {
     firstName: string;
     lastName: string;
     phone?: string;
-  }) {
-    return this.request('/api/auth/signup', {
+  }): Promise<ApiResponse<{ user: ApiUser; token: string }>> {
+    return this.request<{ user: ApiUser; token: string }>('/api/auth/signup', {
       method: 'POST',
       body: JSON.stringify(data),
     });
   }
 
-  async login(data: { email: string; password: string }) {
-    return this.request('/api/auth/login', {
+  async login(data: { email: string; password: string }): Promise<ApiResponse<{ user: ApiUser; token: string }>> {
+    return this.request<{ user: ApiUser; token: string }>('/api/auth/login', {
       method: 'POST',
       body: JSON.stringify(data),
     });
@@ -72,7 +76,11 @@ class ApiClient {
   }
 
   async getCurrentUser() {
-    return this.request('/api/auth/me');
+    return this.request<ApiUser>('/api/auth/me');
+  }
+
+  async getProfile() {
+    return this.request<ApiUser>('/api/user/profile');
   }
 
   // Product endpoints
@@ -132,69 +140,65 @@ class ApiClient {
     tax: number;
     total: number;
     paymentMethod?: string;
+    paymentReference?: string;
     notes?: string;
-  }) {
-    return this.request('/api/orders', {
+  }): Promise<ApiResponse<ApiOrder>> {
+    return this.request<ApiOrder>('/api/orders', {
       method: 'POST',
       body: JSON.stringify(data),
     });
   }
-
-  async getOrders() {
-    return this.request('/api/orders');
+ 
+  async verifyPaystackPayment(reference: string): Promise<ApiResponse<{ verified: boolean; reference: string }>> {
+      return this.request<{ verified: boolean; reference: string }>('/api/paystack/verify', {
+      method: 'POST',
+      body: JSON.stringify({ reference }),
+    });
+  }
+ 
+  async getOrders(): Promise<ApiResponse<ApiOrder[]>> {
+    return this.request<ApiOrder[]>('/api/orders');
+  }
+ 
+  async getOrder(id: string): Promise<ApiResponse<ApiOrder>> {
+    return this.request<ApiOrder>(`/api/orders/${id}`);
   }
 
-  async getOrder(id: string) {
-    return this.request(`/api/orders/${id}`);
-  }
-
-  // User endpoints (to be added)
-  async updateProfile(data: {
-    firstName?: string;
-    lastName?: string;
-    phone?: string;
-  }) {
-    return this.request('/api/user/profile', {
+  // User endpoints
+  async updateProfile(data: UpdateProfileData): Promise<ApiResponse<ApiUser>> {
+    return this.request<ApiUser>('/api/user/profile', {
       method: 'PUT',
       body: JSON.stringify(data),
     });
   }
 
-  async getAddresses() {
-    return this.request('/api/user/addresses');
+  async getAddresses(): Promise<ApiResponse<Address[]>> {
+    return this.request<Address[]>('/api/user/addresses');
   }
 
-  async createAddress(data: {
-    firstName: string;
-    lastName: string;
-    address: string;
-    city: string;
-    state: string;
-    zipCode: string;
-    country: string;
-    phone: string;
-    isDefault?: boolean;
-  }) {
-    return this.request('/api/user/addresses', {
+  async createAddress(data: Omit<Address, 'id'>): Promise<ApiResponse<ApiAddress>> {
+    const requestData = mapAddressToApi({ ...data, id: '' } as Address);
+    return this.request<ApiAddress>('/api/user/addresses', {
       method: 'POST',
-      body: JSON.stringify(data),
+      body: JSON.stringify(requestData),
     });
   }
 
-  async updateAddress(id: string, data: Partial<{
-    firstName: string;
-    lastName: string;
-    address: string;
-    city: string;
-    state: string;
-    zipCode: string;
-    country: string;
-    phone: string;
-    isDefault: boolean;
-  }>) {
-    return this.request(`/api/user/addresses/${id}`, {
+  async updateAddress(id: string, data: Partial<Address>): Promise<ApiResponse<ApiAddress>> {
+    const requestData: Partial<Record<string, unknown>> = {};
+    if (data.firstName !== undefined) requestData.firstName = data.firstName;
+    if (data.lastName !== undefined) requestData.lastName = data.lastName;
+    if (data.street !== undefined) requestData.address = data.street;
+    if (data.city !== undefined) requestData.city = data.city;
+    if (data.state !== undefined) requestData.state = data.state;
+    if (data.postalCode !== undefined) requestData.zipCode = data.postalCode;
+    if (data.country !== undefined) requestData.country = data.country;
+    if (data.phone !== undefined) requestData.phone = data.phone;
+    if (data.isDefault !== undefined) requestData.isDefault = data.isDefault;
+
+    return this.request<ApiAddress>(`/api/user/addresses/${id}`, {
       method: 'PUT',
-      body: JSON.stringify(data),
+      body: JSON.stringify(requestData),
     });
   }
 
