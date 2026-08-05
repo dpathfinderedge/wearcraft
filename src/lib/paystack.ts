@@ -25,7 +25,7 @@ export const initializePaystackPayment = (config: PaystackConfig) => {
     key: config.publicKey,
     email: config.email,
     amount: config.amount,
-    currency: config.currency || 'USD',
+    currency: config.currency || 'NGN',
     ref: config.reference || generateOrderNumber(),
     onClose: config.onClose,
     callback: config.onSuccess,

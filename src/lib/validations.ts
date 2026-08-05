@@ -33,6 +33,7 @@ export const addressSchema = z.object({
   postalCode: z.string().min(4, 'Postal code is required'),
   country: z.string().min(2, 'Country is required'),
   phone: z.string().min(10, 'Please enter a valid phone number'),
+  isDefault: z.boolean().optional(),
 });
 
 /**
@@ -42,6 +43,15 @@ export const checkoutSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
   shippingAddress: addressSchema,
   paymentMethod: z.enum(['card', 'paystack']),
+});
+
+/**
+ * Profile update validation schema
+ */
+export const profileSchema = z.object({
+  firstName: z.string().min(2, 'First name is required'),
+  lastName: z.string().min(2, 'Last name is required'),
+  phone: z.string().optional(),
 });
 
 /**
@@ -68,5 +78,6 @@ export type LoginInput = z.infer<typeof loginSchema>;
 export type SignupInput = z.infer<typeof signupSchema>;
 export type AddressInput = z.infer<typeof addressSchema>;
 export type CheckoutInput = z.infer<typeof checkoutSchema>;
+export type ProfileInput = z.infer<typeof profileSchema>;
 export type ReviewInput = z.infer<typeof reviewSchema>;
 export type ContactInput = z.infer<typeof contactSchema>;
