@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Order, OrderStatus, CheckoutData } from '@/types/order';
-import { CartItem } from '@/types/cart';
+import { Order, OrderItem, OrderStatus, CheckoutData } from '@/types/order';
 import { generateId, generateOrderNumber } from '@/lib/utils';
 
 interface OrderStore {
@@ -11,7 +10,7 @@ interface OrderStore {
   // Actions
   createOrder: (
     userId: string,
-    items: CartItem[],
+    items: OrderItem[],
     checkoutData: CheckoutData,
     summary: { subtotal: number; shipping: number; tax: number; total: number }
   ) => Order;
