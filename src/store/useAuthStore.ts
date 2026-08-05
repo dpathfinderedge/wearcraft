@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { User, Address, AuthCredentials, SignupData } from '@/types/user';
+import { User, Address, ApiAddress, AuthCredentials, SignupData, UpdateProfileData } from '@/types/user';
 import { apiClient } from '@/lib/api-client';
 import { mapUserFromApi, mapAddressFromApi } from '@/lib/mappers';
 
@@ -16,14 +16,17 @@ interface AuthStore {
   signup: (data: SignupData) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
+  // Load addresses from the backend (useful to refresh on-demand)
+  loadAddresses: () => Promise<{ success: boolean; error?: string } | void>;
+  updateProfile: (profile: UpdateProfileData) => Promise<{ success: boolean; error?: string }>;
   updateUser: (userData: Partial<User>) => void;
   clearError: () => void;
   
   // Address management
-  addAddress: (address: Omit<Address, 'id'>) => void;
-  updateAddress: (addressId: string, address: Partial<Address>) => void;
-  removeAddress: (addressId: string) => void;
-  setDefaultAddress: (addressId: string) => void;
+  addAddress: (address: Omit<Address, 'id'> & { isDefault?: boolean }) => Promise<{ success: boolean; error?: string }>;
+  updateAddress: (addressId: string, address: Partial<Address>) => Promise<{ success: boolean; error?: string }>;
+  removeAddress: (addressId: string) => Promise<{ success: boolean; error?: string }>;
+  setDefaultAddress: (addressId: string) => Promise<{ success: boolean; error?: string }>;
   getDefaultAddress: () => Address | null;
 }
 
@@ -47,25 +50,21 @@ export const useAuthStore = create<AuthStore>()(
 
           if (response.success && response.data) {
             const { user } = response.data;
-            
-            // Map API user using helper
             const mappedUser = mapUserFromApi(user);
-
-            // Map addresses using helper
             const addresses = user.addresses?.map(mapAddressFromApi) || [];
 
-            set({ 
-              user: mappedUser, 
+            set({
+              user: mappedUser,
               addresses,
-              isAuthenticated: true, 
-              isLoading: false 
+              isAuthenticated: true,
+              isLoading: false,
             });
 
             return { success: true };
-          } else {
-            set({ isLoading: false, error: response.error || 'Login failed' });
-            return { success: false, error: response.error || 'Login failed' };
           }
+
+          set({ isLoading: false, error: response.error || 'Login failed' });
+          return { success: false, error: response.error || 'Login failed' };
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : 'Login failed';
           set({ isLoading: false, error: errorMessage });
@@ -77,7 +76,6 @@ export const useAuthStore = create<AuthStore>()(
         set({ isLoading: true, error: null });
 
         try {
-          // Split name into firstName and lastName
           const nameParts = data.name.trim().split(' ');
           const firstName = nameParts[0];
           const lastName = nameParts.slice(1).join(' ') || nameParts[0];
@@ -92,22 +90,20 @@ export const useAuthStore = create<AuthStore>()(
 
           if (response.success && response.data) {
             const { user } = response.data;
-            
-            // Map API user using helper
             const mappedUser = mapUserFromApi(user);
 
-            set({ 
-              user: mappedUser, 
+            set({
+              user: mappedUser,
               addresses: [],
-              isAuthenticated: true, 
-              isLoading: false 
+              isAuthenticated: true,
+              isLoading: false,
             });
 
             return { success: true };
-          } else {
-            set({ isLoading: false, error: response.error || 'Signup failed' });
-            return { success: false, error: response.error || 'Signup failed' };
           }
+
+          set({ isLoading: false, error: response.error || 'Signup failed' });
+          return { success: false, error: response.error || 'Signup failed' };
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : 'Signup failed';
           set({ isLoading: false, error: errorMessage });
@@ -120,67 +116,103 @@ export const useAuthStore = create<AuthStore>()(
 
         try {
           await apiClient.logout();
-          
-          set({ 
-            user: null, 
-            addresses: [], 
-            isAuthenticated: false, 
+
+          set({
+            user: null,
+            addresses: [],
+            isAuthenticated: false,
             isLoading: false,
-            error: null 
+            error: null,
           });
 
-          // Clear cart on logout
           if (typeof window !== 'undefined') {
             localStorage.removeItem('wearcraft-cart-storage');
           }
-        } catch (error) {
-          // Even if logout fails, clear local state
-          set({ 
-            user: null, 
-            addresses: [], 
-            isAuthenticated: false, 
-            isLoading: false 
+        } catch {
+          set({
+            user: null,
+            addresses: [],
+            isAuthenticated: false,
+            isLoading: false,
           });
         }
       },
 
       checkAuth: async () => {
         set({ isLoading: true, error: null });
-
+ 
         try {
           const response = await apiClient.getCurrentUser();
+ 
+          if (response.success && response.data) {
+            const user = response.data;
+            const mappedUser = mapUserFromApi(user);
+            const addresses = user.addresses?.map(mapAddressFromApi) || [];
+ 
+            set({
+              user: mappedUser,
+              addresses,
+              isAuthenticated: true,
+              isLoading: false,
+            });
+            return;
+          }
+ 
+          set({
+            user: null,
+            addresses: [],
+            isAuthenticated: false,
+            isLoading: false,
+          });
+        } catch {
+          set({
+            user: null,
+            addresses: [],
+            isAuthenticated: false,
+            isLoading: false,
+          });
+        }
+      },
+
+      // Fetch addresses from backend and update store (useful for on-demand refresh)
+      loadAddresses: async () => {
+        set({ isLoading: true, error: null });
+        try {
+          const resp = await apiClient.getAddresses();
+          if (resp.success && resp.data) {
+            const mapped = (resp.data || []).map(mapAddressFromApi);
+            set({ addresses: mapped, isLoading: false });
+            return { success: true };
+          }
+          set({ isLoading: false, error: resp.error || 'Failed to load addresses' });
+          return { success: false, error: resp.error || 'Failed to load addresses' };
+        } catch (err) {
+          const errorMessage = err instanceof Error ? err.message : 'Failed to load addresses';
+          set({ isLoading: false, error: errorMessage });
+          return { success: false, error: errorMessage };
+        }
+      },
+ 
+      updateProfile: async (profile) => {
+        set({ isLoading: true, error: null });
+
+        try {
+          const response = await apiClient.updateProfile(profile);
 
           if (response.success && response.data) {
             const user = response.data;
-            
-            // Map API user using helper
             const mappedUser = mapUserFromApi(user);
 
-            // Map addresses using helper
-            const addresses = user.addresses?.map(mapAddressFromApi) || [];
-
-            set({ 
-              user: mappedUser, 
-              addresses,
-              isAuthenticated: true, 
-              isLoading: false 
-            });
-          } else {
-            // Not authenticated or token expired
-            set({ 
-              user: null, 
-              addresses: [], 
-              isAuthenticated: false, 
-              isLoading: false 
-            });
+            set({ user: mappedUser, isLoading: false });
+            return { success: true };
           }
+
+          set({ isLoading: false, error: response.error || 'Failed to update profile' });
+          return { success: false, error: response.error || 'Failed to update profile' };
         } catch (error) {
-          set({ 
-            user: null, 
-            addresses: [], 
-            isAuthenticated: false, 
-            isLoading: false 
-          });
+          const errorMessage = error instanceof Error ? error.message : 'Failed to update profile';
+          set({ isLoading: false, error: errorMessage });
+          return { success: false, error: errorMessage };
         }
       },
 
@@ -194,47 +226,117 @@ export const useAuthStore = create<AuthStore>()(
         set({ error: null });
       },
 
-      addAddress: (address) => {
-        const newAddress: Address = {
-          ...address,
-          id: `temp-${Date.now()}`, // Temporary ID, should be from API
-          isDefault: get().addresses.length === 0,
-        };
+      addAddress: async (address) => {
+        set({ isLoading: true, error: null });
 
-        set((state) => ({
-          addresses: [...state.addresses, newAddress],
-        }));
-      },
+        try {
+          const response = await apiClient.createAddress({
+            ...address,
+            id: '',
+          } as Address);
 
-      updateAddress: (addressId, addressData) => {
-        set((state) => ({
-          addresses: state.addresses.map((addr) =>
-            addr.id === addressId ? { ...addr, ...addressData } : addr
-          ),
-        }));
-      },
-
-      removeAddress: (addressId) => {
-        set((state) => {
-          const remainingAddresses = state.addresses.filter(
-            (addr) => addr.id !== addressId
-          );
-
-          if (remainingAddresses.length > 0 && !remainingAddresses.some(a => a.isDefault)) {
-            remainingAddresses[0].isDefault = true;
+          if (response.success && response.data) {
+            const newAddress = mapAddressFromApi(response.data as ApiAddress);
+            set((state) => ({
+              addresses: [newAddress, ...state.addresses],
+              isLoading: false,
+            }));
+            return { success: true };
           }
 
-          return { addresses: remainingAddresses };
-        });
+          set({ isLoading: false, error: response.error || 'Failed to save address' });
+          return { success: false, error: response.error || 'Failed to save address' };
+        } catch (_error) {
+          const errorMessage = _error instanceof Error ? _error.message : 'Failed to save address';
+          set({ isLoading: false, error: errorMessage });
+          return { success: false, error: errorMessage };
+        }
       },
 
-      setDefaultAddress: (addressId) => {
-        set((state) => ({
-          addresses: state.addresses.map((addr) => ({
-            ...addr,
-            isDefault: addr.id === addressId,
-          })),
-        }));
+      updateAddress: async (addressId, addressData) => {
+        set({ isLoading: true, error: null });
+
+        try {
+          const response = await apiClient.updateAddress(addressId, addressData as Address);
+
+          if (response.success && response.data) {
+            const updatedAddress = mapAddressFromApi(response.data as ApiAddress);
+            set((state) => ({
+              addresses: state.addresses.map((addr) =>
+                addr.id === addressId ? updatedAddress : addr
+              ),
+              isLoading: false,
+            }));
+            return { success: true };
+          }
+
+          set({ isLoading: false, error: response.error || 'Failed to update address' });
+          return { success: false, error: response.error || 'Failed to update address' };
+        } catch (_error) {
+          const errorMessage = _error instanceof Error ? _error.message : 'Failed to update address';
+          set({ isLoading: false, error: errorMessage });
+          return { success: false, error: errorMessage };
+        }
+      },
+
+      removeAddress: async (addressId) => {
+        set({ isLoading: true, error: null });
+
+        try {
+          if (addressId.startsWith('temp-')) {
+            set((state) => ({
+              addresses: state.addresses.filter((addr) => addr.id !== addressId),
+              isLoading: false,
+            }));
+            return { success: true };
+          }
+
+          const response = await apiClient.deleteAddress(addressId);
+
+          if (response.success) {
+            set((state) => {
+              const remainingAddresses = state.addresses.filter((addr) => addr.id !== addressId);
+              if (remainingAddresses.length > 0 && !remainingAddresses.some((addr) => addr.isDefault)) {
+                remainingAddresses[0].isDefault = true;
+              }
+              return { addresses: remainingAddresses, isLoading: false };
+            });
+            return { success: true };
+          }
+
+          set({ isLoading: false, error: response.error || 'Failed to delete address' });
+          return { success: false, error: response.error || 'Failed to delete address' };
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : 'Failed to delete address';
+          set({ isLoading: false, error: errorMessage });
+          return { success: false, error: errorMessage };
+        }
+      },
+
+      setDefaultAddress: async (addressId) => {
+        set({ isLoading: true, error: null });
+
+        try {
+          const response = await apiClient.updateAddress(addressId, { isDefault: true } as Partial<Address>);
+
+          if (response.success && response.data) {
+            set((state) => ({
+              addresses: state.addresses.map((addr) => ({
+                ...addr,
+                isDefault: addr.id === addressId,
+              })),
+              isLoading: false,
+            }));
+            return { success: true };
+          }
+
+          set({ isLoading: false, error: response.error || 'Failed to set default address' });
+          return { success: false, error: response.error || 'Failed to set default address' };
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : 'Failed to set default address';
+          set({ isLoading: false, error: errorMessage });
+          return { success: false, error: errorMessage };
+        }
       },
 
       getDefaultAddress: () => {
