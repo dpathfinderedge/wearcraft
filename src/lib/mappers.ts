@@ -1,5 +1,9 @@
 import { Address } from '@/types/user';
 
+type ApiAddressShape = Record<string, unknown>;
+
+type ApiUserShape = Record<string, unknown>;
+
 /**
  * Maps our Address type to API Address format
  * Frontend uses: street, postalCode
@@ -15,36 +19,38 @@ export function mapAddressToApi(address: Address) {
     zipCode: address.postalCode, // Frontend 'postalCode' -> API 'zipCode'
     country: address.country,
     phone: address.phone,
+    isDefault: address.isDefault,
   };
 }
 
 /**
  * Maps API Address to our Address type
  */
-export function mapAddressFromApi(apiAddress: any): Address {
+export function mapAddressFromApi(apiAddress: ApiAddressShape): Address {
   return {
-    id: apiAddress.id,
-    firstName: apiAddress.firstName,
-    lastName: apiAddress.lastName,
-    street: apiAddress.address, // API 'address' -> Frontend 'street'
-    city: apiAddress.city,
-    state: apiAddress.state,
-    postalCode: apiAddress.zipCode, // API 'zipCode' -> Frontend 'postalCode'
-    country: apiAddress.country,
-    phone: apiAddress.phone,
-    isDefault: apiAddress.isDefault,
+    id: String(apiAddress.id),
+    firstName: String(apiAddress.firstName),
+    lastName: String(apiAddress.lastName),
+    street: String(apiAddress.address), // API 'address' -> Frontend 'street'
+    city: String(apiAddress.city),
+    state: String(apiAddress.state),
+    postalCode: String(apiAddress.zipCode), // API 'zipCode' -> Frontend 'postalCode'
+    country: String(apiAddress.country),
+    phone: String(apiAddress.phone),
+    isDefault: Boolean(apiAddress.isDefault),
   };
 }
 
 /**
  * Maps API User to our User type
  */
-export function mapUserFromApi(apiUser: any) {
+export function mapUserFromApi(apiUser: ApiUserShape) {
   return {
-    id: apiUser.id,
-    email: apiUser.email,
-    name: `${apiUser.firstName} ${apiUser.lastName}`,
+    id: String(apiUser.id),
+    email: String(apiUser.email),
+    name: `${String(apiUser.firstName || '')} ${String(apiUser.lastName || '')}`.trim(),
     avatar: undefined, // Add if API provides avatar
-    createdAt: apiUser.createdAt,
+    phone: apiUser.phone ? String(apiUser.phone) : undefined,
+    createdAt: String(apiUser.createdAt),
   };
 }
