@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { addressSchema, AddressInput } from '@/lib/validations';
@@ -10,13 +10,38 @@ interface CheckoutFormProps {
   onSubmit: (data: AddressInput) => void;
   defaultValues?: Partial<AddressInput>;
   isLoading?: boolean;
+  loadPaystackScript?: boolean;
+  onPaystackLoad?: () => void;
+  onPaystackError?: () => void;
 }
 
 export const CheckoutForm: React.FC<CheckoutFormProps> = ({
   onSubmit,
   defaultValues,
   isLoading,
+  loadPaystackScript = false,
+  onPaystackLoad,
+  onPaystackError,
 }) => {
+  const formRef = useRef<HTMLFormElement>(null);
+
+  useEffect(() => {
+    if (!loadPaystackScript || !formRef.current) {
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = 'https://js.paystack.co/v1/inline.js';
+    script.async = true;
+    script.onload = () => onPaystackLoad?.();
+    script.onerror = () => onPaystackError?.();
+    formRef.current.appendChild(script);
+
+    return () => {
+      script.remove();
+    };
+  }, [loadPaystackScript, onPaystackError, onPaystackLoad]);
+
   const {
     register,
     handleSubmit,
@@ -27,7 +52,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
   });
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <form ref={formRef} onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       {/* Contact Information */}
       <div>
         <h3 className="text-lg font-semibold text-gray-900 mb-4">

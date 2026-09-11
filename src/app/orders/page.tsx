@@ -34,11 +34,15 @@ type OrderListItem = {
 
 export default function OrdersPage() {
   const router = useRouter();
-  const { user, isAuthenticated } = useAuthStore();
+  const { user, isAuthenticated, hasHydrated } = useAuthStore();
   const [orders, setOrders] = useState<OrderListItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!hasHydrated) {
+      return;
+    }
+
     if (!isAuthenticated) {
       router.push('/auth/login?redirect=/orders');
       return;
@@ -55,7 +59,7 @@ export default function OrdersPage() {
     };
 
     fetchOrders();
-  }, [isAuthenticated, router]);
+  }, [hasHydrated, isAuthenticated, router]);
 
   if (!user) {
     return null;

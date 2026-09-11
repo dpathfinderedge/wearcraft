@@ -34,7 +34,7 @@ const blankAddress: AddressInput = {
 export default function ProfilePage() {
   const router = useRouter();
   const { showToast } = useToast();
-  const { user, addresses, isAuthenticated, isLoading, updateProfile, addAddress, updateAddress, removeAddress, setDefaultAddress, loadAddresses } = useAuthStore();
+  const { user, addresses, isAuthenticated, hasHydrated, isLoading, updateProfile, addAddress, updateAddress, removeAddress, setDefaultAddress, loadAddresses } = useAuthStore();
 
   const [activeTab, setActiveTab] = useState<TabId>('profile');
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
@@ -50,10 +50,10 @@ export default function ProfilePage() {
   });
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
+    if (hasHydrated && !isLoading && !isAuthenticated) {
       router.push('/auth/login?redirect=/profile');
     }
-  }, [isAuthenticated, isLoading, router]);
+  }, [hasHydrated, isAuthenticated, isLoading, router]);
 
   // On first render, if authenticated but addresses are empty, fetch them from API
   useEffect(() => {

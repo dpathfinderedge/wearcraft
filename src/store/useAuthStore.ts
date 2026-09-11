@@ -8,6 +8,7 @@ interface AuthStore {
   user: User | null;
   addresses: Address[];
   isAuthenticated: boolean;
+  hasHydrated: boolean;
   isLoading: boolean;
   error: string | null;
   
@@ -36,6 +37,7 @@ export const useAuthStore = create<AuthStore>()(
       user: null,
       addresses: [],
       isAuthenticated: false,
+      hasHydrated: false,
       isLoading: false,
       error: null,
 
@@ -351,6 +353,9 @@ export const useAuthStore = create<AuthStore>()(
         addresses: state.addresses,
         isAuthenticated: state.isAuthenticated,
       }),
+      onRehydrateStorage: () => () => {
+        useAuthStore.setState({ hasHydrated: true });
+      },
     }
   )
 );

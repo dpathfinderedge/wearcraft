@@ -214,8 +214,7 @@
 
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import Script from 'next/script';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCartStore, useAuthStore } from '@/store';
 import { CheckoutForm, OrderSummary } from '@/components/checkout';
@@ -236,7 +235,7 @@ export default function CheckoutPage() {
   const router = useRouter();
   const { showToast } = useToast();
   const { items, getCartSummary, clearCart } = useCartStore();
-  const { user, isAuthenticated } = useAuthStore();
+  const { user, isAuthenticated, hasHydrated } = useAuthStore();
 
   const [shippingAddress, setShippingAddress] = useState<AddressInput | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -245,10 +244,22 @@ export default function CheckoutPage() {
 
   const summary = getCartSummary();
   const paystackPublicKey = getPaystackPublicKey();
-  const hasValidPaystackKey = paystackPublicKey && paystackPublicKey !== 'pk_test_default_key';
+  const hasValidPaystackKey = Boolean(
+    paystackPublicKey && paystackPublicKey !== 'pk_test_default_key'
+  );
   const amountInKobo = convertToKobo(summary.total);
+  const handlePaystackLoad = useCallback(() => {
+    setPaystackLoaded(true);
+  }, []);
+  const handlePaystackError = useCallback(() => {
+    showToast('Unable to load PayStack. Demo checkout will still work.', 'warning');
+  }, [showToast]);
 
   useEffect(() => {
+    if (!hasHydrated) {
+      return;
+    }
+
     if (!isAuthenticated) {
       showToast('Please login to continue', 'error');
       router.push('/auth/login?redirect=/checkout');
@@ -258,7 +269,7 @@ export default function CheckoutPage() {
     if (items.length === 0) {
       router.push('/cart');
     }
-  }, [isAuthenticated, items.length, router, showToast]);
+  }, [hasHydrated, isAuthenticated, items.length, router, showToast]);
 
   const handleFormSubmit = (data: AddressInput) => {
     setShippingAddress(data);
@@ -377,14 +388,6 @@ export default function CheckoutPage() {
 
   return (
     <>
-      <Script
-        src="https://js.paystack.co/v1/inline.js"
-        onLoad={() => setPaystackLoaded(true)}
-        onError={() => {
-          showToast('Unable to load PayStack. Demo checkout will still work.', 'warning');
-        }}
-      />
-
       {isProcessing && <LoadingOverlay message="Processing your order..." />}
 
       <div className="min-h-screen bg-white">
@@ -415,6 +418,9 @@ export default function CheckoutPage() {
                   phone: shippingAddress?.phone || '',
                 }}
                 isLoading={isProcessing}
+                loadPaystackScript={hasValidPaystackKey}
+                onPaystackLoad={handlePaystackLoad}
+                onPaystackError={handlePaystackError}
               />
 
               <div className="mt-8 pt-8 border-t border-gray-200">
