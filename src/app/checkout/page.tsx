@@ -226,30 +226,6 @@ import { initializePaystackPayment, convertToKobo, getPaystackPublicKey } from '
 import { ShieldCheck } from 'lucide-react';
 import { apiClient } from '@/lib/api-client';
 
-declare global {
-  interface PaystackSuccessResponse {
-    status: string;
-    reference: string;
-    message?: string;
-  }
-
-  interface Window {
-    PaystackPop?: {
-      setup: (config: {
-        key: string;
-        email: string;
-        amount: number;
-        currency: string;
-        ref?: string;
-        onClose: () => void;
-        callback: (response: PaystackSuccessResponse) => void;
-      }) => {
-        openIframe: () => void;
-      };
-    };
-  }
-}
-
 interface PaystackResponse {
   status: string;
   reference: string;

@@ -1,4 +1,4 @@
-import { SignJWT, jwtVerify } from 'jose';
+import { SignJWT, jwtVerify, type JWTPayload as JoseJWTPayload } from 'jose';
 import { cookies } from 'next/headers';
 import { NextRequest } from 'next/server';
 import bcrypt from 'bcryptjs';
@@ -10,11 +10,9 @@ const JWT_SECRET = new TextEncoder().encode(
 const TOKEN_NAME = 'wearcraft-token';
 const TOKEN_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
 
-export interface JWTPayload {
+export interface JWTPayload extends JoseJWTPayload {
   userId: string;
   email: string;
-  iat?: number;
-  exp?: number;
 }
 
 // Hash password

@@ -6,8 +6,36 @@ interface PaystackConfig {
   amount: number; // in kobo (smallest currency unit)
   currency?: string;
   reference?: string;
-  onSuccess: (reference: any) => void;
+  onSuccess: (reference: PaystackCallbackData) => void;
   onClose: () => void;
+}
+
+interface PaystackCallbackData {
+  status: string;
+  reference: string;
+  [key: string]: unknown;
+}
+
+interface PaystackHandler {
+  openIframe: () => void;
+}
+
+interface PaystackPop {
+  setup: (config: {
+    key: string;
+    email: string;
+    amount: number;
+    currency: string;
+    ref: string;
+    onClose: () => void;
+    callback: (reference: PaystackCallbackData) => void;
+  }) => PaystackHandler;
+}
+
+declare global {
+  interface Window {
+    PaystackPop?: PaystackPop;
+  }
 }
 
 /**
@@ -16,12 +44,12 @@ interface PaystackConfig {
  */
 export const initializePaystackPayment = (config: PaystackConfig) => {
   // Check if PaystackPop is available
-  if (typeof window === 'undefined' || !(window as any).PaystackPop) {
+  if (typeof window === 'undefined' || !window.PaystackPop) {
     console.error('PayStack script not loaded');
     return;
   }
 
-  const handler = (window as any).PaystackPop.setup({
+  const handler = window.PaystackPop.setup({
     key: config.publicKey,
     email: config.email,
     amount: config.amount,
@@ -52,6 +80,7 @@ export const getPaystackPublicKey = (): string => {
  * Mock payment verification (in production, this should be done on the server)
  */
 export const verifyPayment = async (reference: string): Promise<boolean> => {
+  void reference;
   // In production, this should call your backend API
   // which verifies the payment with PayStack
   

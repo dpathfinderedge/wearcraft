@@ -1,22 +1,20 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useSyncExternalStore } from 'react';
 import Link from 'next/link';
 import { ShoppingCart, User, Menu, X, Search } from 'lucide-react';
 import { useCartStore, useAuthStore } from '@/store';
-import { cn } from '@/lib/utils';
 
 export const Navbar: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const mounted = useSyncExternalStore(
+    () => () => undefined,
+    () => true,
+    () => false
+  );
   const { getItemCount } = useCartStore();
   const { user, isAuthenticated, logout } = useAuthStore();
   
-  // Prevent hydration mismatch by only rendering dynamic content after mount
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
   const cartItemCount = mounted ? getItemCount() : 0;
 
   const navigation = [

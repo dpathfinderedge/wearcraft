@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { Prisma } from '@prisma/client';
 
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   success: boolean;
   data?: T;
   error?: string;
@@ -28,7 +28,7 @@ export function successResponse<T>(
 export function errorResponse(
   error: string,
   status: number = 400
-): NextResponse<ApiResponse> {
+): NextResponse<ApiResponse<never>> {
   return NextResponse.json(
     {
       success: false,
@@ -96,7 +96,7 @@ export async function parseBody<T>(request: Request): Promise<T> {
   try {
     const body = await request.json();
     return body as T;
-  } catch (error) {
+  } catch {
     throw new Error('Invalid request body');
   }
 }

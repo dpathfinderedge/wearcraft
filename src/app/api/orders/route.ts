@@ -1,4 +1,5 @@
 import { NextRequest } from 'next/server';
+import { Prisma } from '@prisma/client';
 import { z } from 'zod';
 import { nanoid } from 'nanoid';
 import prisma from '@/lib/prisma';
@@ -78,7 +79,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Create order with items
-    const orderData: any = {
+    const orderData: Prisma.OrderUncheckedCreateInput = {
       orderNumber,
       userId: authUser.userId,
       addressId: address.id,
@@ -89,7 +90,7 @@ export async function POST(request: NextRequest) {
       paymentMethod: validatedData.paymentMethod || 'paystack',
       notes: validatedData.notes,
       items: {
-        create: validatedData.items.map((item: any) => ({
+        create: validatedData.items.map((item) => ({
           productId: item.productId,
           name: item.name,
           price: item.price,

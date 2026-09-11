@@ -10,15 +10,13 @@ const loginSchema = z.object({
   password: z.string().min(1, 'Password is required'),
 });
 
-type LoginInput = z.infer<typeof loginSchema>;
-
 export async function POST(request: NextRequest) {
   try {
     // Parse request body
-    let body: any;
+    let body: unknown;
     try {
       body = await request.json();
-    } catch (error) {
+    } catch {
       return errorResponse('Invalid JSON in request body', 400);
     }
 
@@ -60,7 +58,8 @@ export async function POST(request: NextRequest) {
     await setAuthCookie(token);
 
     // Remove password from response
-    const { password: _, ...userWithoutPassword } = user;
+    const { password, ...userWithoutPassword } = user;
+    void password;
 
     return successResponse(
       {

@@ -1,4 +1,5 @@
 import { NextRequest } from 'next/server';
+import { Prisma } from '@prisma/client';
 import prisma from '@/lib/prisma';
 import { successResponse, handleApiError } from '@/lib/api-response';
 
@@ -18,7 +19,7 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '20');
 
     // Build where clause
-    const where: any = {
+    const where: Prisma.ProductWhereInput = {
       inStock: true,
     };
 
@@ -50,7 +51,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Build orderBy clause
-    let orderBy: any = {};
+    let orderBy: Prisma.ProductOrderByWithRelationInput;
     switch (sort) {
       case 'price-asc':
         orderBy = { price: 'asc' };

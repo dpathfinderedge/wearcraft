@@ -13,15 +13,13 @@ const signupSchema = z.object({
   phone: z.string().optional(),
 });
 
-type SignupInput = z.infer<typeof signupSchema>;
-
 export async function POST(request: NextRequest) {
   try {
     // Parse request body
-    let body: any;
+    let body: unknown;
     try {
       body = await request.json();
-    } catch (error) {
+    } catch {
       return errorResponse('Invalid JSON in request body', 400);
     }
 
@@ -87,5 +85,7 @@ export async function POST(request: NextRequest) {
 
       return handleApiError(error);
     }
+
+    return handleApiError(error);
   }
 }
