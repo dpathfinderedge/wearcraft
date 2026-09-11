@@ -364,8 +364,8 @@ export default function CheckoutPage() {
           setIsProcessing(false);
           showToast('Payment window closed. You can retry when ready.', 'warning');
         },
-        onSuccess: async (response: PaystackResponse) => {
-          await handlePaystackSuccess(response);
+        onSuccess: (response: PaystackResponse) => {
+          void handlePaystackSuccess(response);
         },
       });
     } else {

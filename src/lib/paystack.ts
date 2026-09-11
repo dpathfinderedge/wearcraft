@@ -49,17 +49,24 @@ export const initializePaystackPayment = (config: PaystackConfig) => {
     return;
   }
 
-  const handler = window.PaystackPop.setup({
-    key: config.publicKey,
-    email: config.email,
-    amount: config.amount,
-    currency: config.currency || 'NGN',
-    ref: config.reference || generateOrderNumber(),
-    onClose: config.onClose,
-    callback: config.onSuccess,
-  });
+  try {
+    const handler = window.PaystackPop.setup({
+      key: config.publicKey,
+      email: config.email,
+      amount: config.amount,
+      currency: config.currency || 'NGN',
+      ref: config.reference || generateOrderNumber(),
+      onClose: config.onClose,
+      callback: function paystackCallback(response) {
+        config.onSuccess(response);
+      },
+    });
 
-  handler.openIframe();
+    handler.openIframe();
+  } catch (error) {
+    console.error('PayStack initialization failed:', error);
+    config.onClose();
+  }
 };
 
 /**
