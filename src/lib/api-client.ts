@@ -172,8 +172,8 @@ class ApiClient {
     });
   }
 
-  async getAddresses(): Promise<ApiResponse<Address[]>> {
-    return this.request<Address[]>('/api/user/addresses');
+  async getAddresses(): Promise<ApiResponse<ApiAddress[]>> {
+    return this.request<ApiAddress[]>('/api/user/addresses');
   }
 
   async createAddress(data: Omit<Address, 'id'>): Promise<ApiResponse<ApiAddress>> {

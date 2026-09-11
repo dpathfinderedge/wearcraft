@@ -1,8 +1,4 @@
-import { Address } from '@/types/user';
-
-type ApiAddressShape = Record<string, unknown>;
-
-type ApiUserShape = Record<string, unknown>;
+import { Address, ApiAddress, ApiUser } from '@/types/user';
 
 /**
  * Maps our Address type to API Address format
@@ -26,7 +22,7 @@ export function mapAddressToApi(address: Address) {
 /**
  * Maps API Address to our Address type
  */
-export function mapAddressFromApi(apiAddress: ApiAddressShape): Address {
+export function mapAddressFromApi(apiAddress: ApiAddress): Address {
   return {
     id: String(apiAddress.id),
     firstName: String(apiAddress.firstName),
@@ -44,7 +40,7 @@ export function mapAddressFromApi(apiAddress: ApiAddressShape): Address {
 /**
  * Maps API User to our User type
  */
-export function mapUserFromApi(apiUser: ApiUserShape) {
+export function mapUserFromApi(apiUser: ApiUser) {
   return {
     id: String(apiUser.id),
     email: String(apiUser.email),

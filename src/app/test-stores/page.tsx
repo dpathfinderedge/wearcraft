@@ -50,7 +50,15 @@ export default function TestStoresPage() {
 
     const order = createOrder(
       user.id,
-      items,
+      items.map((item) => ({
+        productId: item.product.id,
+        name: item.product.name,
+        price: item.product.price,
+        quantity: item.quantity,
+        size: item.selectedSize,
+        color: item.selectedColor,
+        image: item.product.images[0],
+      })),
       {
         email: user.email,
         shippingAddress: {

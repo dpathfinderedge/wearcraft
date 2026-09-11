@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
 import { products as mockProducts } from '../src/data/products';
 
 const prisma = new PrismaClient();
@@ -30,7 +31,7 @@ async function main() {
   // Seed products
   console.log('Seeding products...');
   
-  for (const product of mockProducts as any[]) {
+  for (const product of mockProducts) {
     await prisma.product.create({
       data: {
         name: product.name,
@@ -56,7 +57,6 @@ async function main() {
   console.log(`Seeded ${mockProducts.length} products`);
 
   // Create a test user
-  const bcrypt = require('bcryptjs');
   const hashedPassword = await bcrypt.hash('password123', 12);
 
   const testUser = await prisma.user.create({

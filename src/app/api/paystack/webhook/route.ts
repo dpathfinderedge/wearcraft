@@ -3,6 +3,16 @@ import crypto from 'crypto';
 import { successResponse, errorResponse, handleApiError } from '@/lib/api-response';
 import prisma from '@/lib/prisma';
 
+interface PaystackWebhookData {
+  status?: string;
+  reference?: string;
+}
+
+interface PaystackWebhookPayload {
+  event?: string;
+  data?: PaystackWebhookData;
+}
+
 // Paystack sends X-Paystack-Signature header (sha512 HMAC of raw body)
 export async function POST(req: NextRequest) {
   try {
@@ -20,20 +30,19 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    let body: any = {};
+    let body: PaystackWebhookPayload;
     try {
       body = JSON.parse(raw);
-    } catch (e) {
-      // If parsing fails, return bad request
+    } catch {
       return errorResponse('Invalid JSON body', 400);
     }
 
     const event = body.event || '';
-    const data = body.data || body;
+    const data = body.data;
 
     // Handle successful charge/transaction events
     if (data && (data.status === 'success' || event === 'charge.success' || event === 'transfer.success')) {
-      const reference: string = data.reference;
+      const reference = data.reference;
 
       if (reference) {
         // Try to find matching order by paymentRef or notes containing the reference or orderNumber in metadata
