@@ -94,7 +94,6 @@ export default function OrdersPage() {
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-light text-gray-900 mb-2">
             Order History
@@ -104,7 +103,6 @@ export default function OrdersPage() {
           </p>
         </div>
 
-        {/* Orders List */}
         {loading ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <div className="text-sm text-gray-600">Loading orders...</div>
@@ -145,7 +143,6 @@ export default function OrdersPage() {
                 key={order.id}
                 className="bg-white border border-gray-200 rounded-sm overflow-hidden hover:shadow-sm transition"
               >
-                {/* Order Header */}
                 <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
                   <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 flex-1">
@@ -185,7 +182,6 @@ export default function OrdersPage() {
                   </div>
                 </div>
 
-                {/* Order Items */}
                 <div className="px-6 py-4">
                   <div className="flex items-center gap-4 overflow-x-auto pb-2">
                     {order.items.slice(0, 4).map((item: OrderSummaryItem, index: number) => (
@@ -215,7 +211,6 @@ export default function OrdersPage() {
                   </p>
                 </div>
 
-                {/* Order Actions */}
                 <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-between items-center">
                   <div className="text-sm text-gray-600">
                     {order.trackingNumber && (

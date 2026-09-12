@@ -35,14 +35,12 @@ export const Navbar: React.FC = () => {
     <nav className="bg-white border-b border-gray-200 sticky top-0 z-40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Logo */}
           <div className="flex items-center">
             <Link href="/" className="text-xl font-semibold tracking-tight text-gray-900">
               WearCraft
             </Link>
           </div>
 
-          {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
             {navigation.map((item) => (
               <Link
@@ -55,14 +53,11 @@ export const Navbar: React.FC = () => {
             ))}
           </div>
 
-          {/* Right side icons */}
           <div className="flex items-center space-x-4">
-            {/* Search - Desktop only */}
             <button className="hidden md:block p-2 text-gray-700 hover:text-gray-900 transition">
               <Search size={20} strokeWidth={1.5} />
             </button>
 
-            {/* Cart */}
             <Link href="/cart" className="relative p-2 text-gray-700 hover:text-gray-900 transition">
               <ShoppingCart size={20} strokeWidth={1.5} />
               {mounted && cartItemCount > 0 && (
@@ -72,7 +67,6 @@ export const Navbar: React.FC = () => {
               )}
             </Link>
 
-            {/* User Menu */}
             {mounted && isAuthenticated && user ? (
               <div className="relative group">
                 <button className="hidden md:flex items-center space-x-2 p-2 text-gray-700 hover:text-gray-900 transition">
@@ -91,6 +85,12 @@ export const Navbar: React.FC = () => {
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                   >
                     Order History
+                  </Link>
+                  <Link
+                    href="/wishlist"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                  >
+                    Wishlist
                   </Link>
                   <button
                     onClick={() => void handleLogout()}
@@ -112,7 +112,6 @@ export const Navbar: React.FC = () => {
               )
             )}
 
-            {/* Mobile menu button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="md:hidden p-2 text-gray-700"
@@ -123,7 +122,6 @@ export const Navbar: React.FC = () => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
       {mobileMenuOpen && (
         <div className="md:hidden bg-white border-t border-gray-200">
           <div className="px-4 py-4 space-y-3">
@@ -154,6 +152,13 @@ export const Navbar: React.FC = () => {
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   My Profile
+                </Link>
+                <Link
+                  href="/wishlist"
+                  className="block py-2 text-base font-medium text-gray-700"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Wishlist
                 </Link>
                 <button
                   onClick={() => {
