@@ -53,7 +53,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
 
   return (
     <form ref={formRef} onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      {/* Contact Information */}
+
       <div>
         <h3 className="text-lg font-semibold text-gray-900 mb-4">
           Contact Information
@@ -74,7 +74,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
         </div>
       </div>
 
-      {/* Shipping Address */}
+
       <div>
         <h3 className="text-lg font-semibold text-gray-900 mb-4">
           Shipping Address
@@ -127,9 +127,9 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
         </div>
       </div>
 
-      {/* Submit Button */}
-      <Button 
-        type="submit" 
+
+      <Button
+        type="submit"
         variant="outline"
         size="lg"
         className="w-full"

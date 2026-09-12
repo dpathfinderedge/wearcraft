@@ -54,18 +54,12 @@ export default function ProfilePage() {
       router.push('/auth/login?redirect=/profile');
     }
   }, [hasCheckedAuth, isAuthenticated, isLoading, router]);
-
-  // On first render, if authenticated but addresses are empty, fetch them from API
   useEffect(() => {
     if (isAuthenticated && addresses.length === 0) {
-      // loadAddresses updates the store
       loadAddresses().catch(() => {
-        // swallow error here; store will set error state
       });
     }
   }, [isAuthenticated, addresses.length, loadAddresses]);
-
-  // When the user navigates to the Addresses tab, refresh addresses to ensure up-to-date data
   useEffect(() => {
     if (activeTab === 'addresses' && isAuthenticated) {
       loadAddresses().catch(() => {});

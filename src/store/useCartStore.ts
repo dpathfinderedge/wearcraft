@@ -6,14 +6,10 @@ import { calculateTax, calculateShipping } from '@/lib/utils';
 
 interface CartStore {
   items: CartItem[];
-  
-  // Actions
   addItem: (product: Product, selectedSize: string, selectedColor: string, quantity?: number) => void;
   removeItem: (productId: string, selectedSize: string, selectedColor: string) => void;
   updateQuantity: (productId: string, selectedSize: string, selectedColor: string, quantity: number) => void;
   clearCart: () => void;
-  
-  // Computed values
   getCartSummary: () => CartSummary;
   getItemCount: () => number;
   isInCart: (productId: string, selectedSize: string, selectedColor: string) => boolean;
@@ -35,7 +31,6 @@ export const useCartStore = create<CartStore>()(
           );
 
           if (existingItemIndex > -1) {
-            // Update existing item quantity
             const newItems = [...state.items];
             newItems[existingItemIndex] = {
               ...newItems[existingItemIndex],
@@ -43,7 +38,6 @@ export const useCartStore = create<CartStore>()(
             };
             return { items: newItems };
           } else {
-            // Add new item
             const newItem: CartItem = {
               product,
               quantity,

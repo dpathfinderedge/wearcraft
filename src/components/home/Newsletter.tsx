@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Button, Input } from '@/components/ui';
+import { Button } from '@/components/ui';
 import { useToast } from '@/components/ui';
 
 export const Newsletter: React.FC = () => {
@@ -11,15 +11,13 @@ export const Newsletter: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!email) {
       showToast('Please enter your email address', 'error');
       return;
     }
 
     setIsLoading(true);
-
-    // Simulate API call
     setTimeout(() => {
       showToast('Successfully subscribed to newsletter!', 'success');
       setEmail('');

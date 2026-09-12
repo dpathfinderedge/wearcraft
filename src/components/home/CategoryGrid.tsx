@@ -39,7 +39,7 @@ export const CategoryGrid: React.FC = () => {
   return (
     <section className="py-16 md:py-20 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
+
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-light text-gray-900 mb-2">
             Shop by Category
@@ -47,7 +47,7 @@ export const CategoryGrid: React.FC = () => {
           <p className="text-gray-600">Explore our curated collections</p>
         </div>
 
-        {/* Categories Grid */}
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {categories.map((category) => (
             <Link
@@ -55,17 +55,17 @@ export const CategoryGrid: React.FC = () => {
               href={category.href}
               className="group relative aspect-[3/4] overflow-hidden bg-gray-100"
             >
-              {/* Category Image */}
+
               <img
                 src={category.image}
                 alt={category.name}
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
               />
 
-              {/* Overlay */}
+
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
 
-              {/* Category Info */}
+
               <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
                 <p className="text-xs uppercase tracking-wider mb-1 opacity-90">
                   {category.description}

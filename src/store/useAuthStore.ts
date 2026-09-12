@@ -12,19 +12,14 @@ interface AuthStore {
   hasCheckedAuth: boolean;
   isLoading: boolean;
   error: string | null;
-  
-  // Actions
   login: (credentials: AuthCredentials) => Promise<{ success: boolean; error?: string }>;
   signup: (data: SignupData) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
-  // Load addresses from the backend (useful to refresh on-demand)
   loadAddresses: () => Promise<{ success: boolean; error?: string } | void>;
   updateProfile: (profile: UpdateProfileData) => Promise<{ success: boolean; error?: string }>;
   updateUser: (userData: Partial<User>) => void;
   clearError: () => void;
-  
-  // Address management
   addAddress: (address: Omit<Address, 'id'> & { isDefault?: boolean }) => Promise<{ success: boolean; error?: string }>;
   updateAddress: (addressId: string, address: Partial<Address>) => Promise<{ success: boolean; error?: string }>;
   removeAddress: (addressId: string) => Promise<{ success: boolean; error?: string }>;
@@ -145,15 +140,15 @@ export const useAuthStore = create<AuthStore>()(
 
       checkAuth: async () => {
         set({ isLoading: true, error: null });
- 
+
         try {
           const response = await apiClient.getCurrentUser();
- 
+
           if (response.success && response.data) {
             const user = response.data;
             const mappedUser = mapUserFromApi(user);
             const addresses = user.addresses?.map(mapAddressFromApi) || [];
- 
+
             set({
               user: mappedUser,
               addresses,
@@ -163,7 +158,7 @@ export const useAuthStore = create<AuthStore>()(
             });
             return;
           }
- 
+
           set({
             user: null,
             addresses: [],
@@ -181,8 +176,6 @@ export const useAuthStore = create<AuthStore>()(
           });
         }
       },
-
-      // Fetch addresses from backend and update store (useful for on-demand refresh)
       loadAddresses: async () => {
         set({ isLoading: true, error: null });
         try {
@@ -200,7 +193,7 @@ export const useAuthStore = create<AuthStore>()(
           return { success: false, error: errorMessage };
         }
       },
- 
+
       updateProfile: async (profile) => {
         set({ isLoading: true, error: null });
 
@@ -353,7 +346,6 @@ export const useAuthStore = create<AuthStore>()(
     }),
     {
       name: 'wearcraft-auth-storage',
-      // Don't persist isLoading or error
       partialize: (state) => ({
         user: state.user,
         addresses: state.addresses,
@@ -365,155 +357,3 @@ export const useAuthStore = create<AuthStore>()(
     }
   )
 );
-
-
-// From Here
-
-// import { create } from 'zustand';
-// import { persist } from 'zustand/middleware';
-// import { User, Address, AuthCredentials, SignupData } from '@/types/user';
-// import { generateId } from '@/lib/utils';
-
-// interface AuthStore {
-//   user: User | null;
-//   addresses: Address[];
-//   isAuthenticated: boolean;
-  
-//   // Actions
-//   login: (credentials: AuthCredentials) => Promise<{ success: boolean; error?: string }>;
-//   signup: (data: SignupData) => Promise<{ success: boolean; error?: string }>;
-//   logout: () => void;
-//   updateUser: (userData: Partial<User>) => void;
-  
-//   // Address management
-//   addAddress: (address: Omit<Address, 'id'>) => void;
-//   updateAddress: (addressId: string, address: Partial<Address>) => void;
-//   removeAddress: (addressId: string) => void;
-//   setDefaultAddress: (addressId: string) => void;
-//   getDefaultAddress: () => Address | null;
-// }
-
-// export const useAuthStore = create<AuthStore>()(
-//   persist(
-//     (set, get) => ({
-//       user: null,
-//       addresses: [],
-//       isAuthenticated: false,
-
-//       login: async (credentials) => {
-//         // Simulate API call
-//         await new Promise((resolve) => setTimeout(resolve, 1000));
-
-//         // Mock validation - in production, this would call your backend
-//         if (!credentials.email || !credentials.password) {
-//           return { success: false, error: 'Email and password are required' };
-//         }
-
-//         if (credentials.password.length < 6) {
-//           return { success: false, error: 'Invalid email or password' };
-//         }
-
-//         // Mock successful login
-//         const mockUser: User = {
-//           id: generateId(),
-//           email: credentials.email,
-//           name: credentials.email.split('@')[0],
-//           createdAt: new Date().toISOString(),
-//         };
-
-//         set({ user: mockUser, isAuthenticated: true });
-//         return { success: true };
-//       },
-
-//       signup: async (data) => {
-//         // Simulate API call
-//         await new Promise((resolve) => setTimeout(resolve, 1000));
-
-//         // Mock validation
-//         if (!data.name || !data.email || !data.password) {
-//           return { success: false, error: 'All fields are required' };
-//         }
-
-//         if (data.password.length < 6) {
-//           return { success: false, error: 'Password must be at least 6 characters' };
-//         }
-
-//         // Mock successful signup
-//         const mockUser: User = {
-//           id: generateId(),
-//           email: data.email,
-//           name: data.name,
-//           createdAt: new Date().toISOString(),
-//         };
-
-//         set({ user: mockUser, isAuthenticated: true });
-//         return { success: true };
-//       },
-
-//       logout: () => {
-//         set({ user: null, addresses: [], isAuthenticated: false });
-//         // Also clear cart on logout
-//         if (typeof window !== 'undefined') {
-//           localStorage.removeItem('wearcraft-cart-storage');
-//         }
-//       },
-
-//       updateUser: (userData) => {
-//         set((state) => ({
-//           user: state.user ? { ...state.user, ...userData } : null,
-//         }));
-//       },
-
-//       addAddress: (address) => {
-//         const newAddress: Address = {
-//           ...address,
-//           id: generateId(),
-//           isDefault: get().addresses.length === 0, // First address is default
-//         };
-
-//         set((state) => ({
-//           addresses: [...state.addresses, newAddress],
-//         }));
-//       },
-
-//       updateAddress: (addressId, addressData) => {
-//         set((state) => ({
-//           addresses: state.addresses.map((addr) =>
-//             addr.id === addressId ? { ...addr, ...addressData } : addr
-//           ),
-//         }));
-//       },
-
-//       removeAddress: (addressId) => {
-//         set((state) => {
-//           const remainingAddresses = state.addresses.filter(
-//             (addr) => addr.id !== addressId
-//           );
-
-//           // If we removed the default address, make the first one default
-//           if (remainingAddresses.length > 0 && !remainingAddresses.some(a => a.isDefault)) {
-//             remainingAddresses[0].isDefault = true;
-//           }
-
-//           return { addresses: remainingAddresses };
-//         });
-//       },
-
-//       setDefaultAddress: (addressId) => {
-//         set((state) => ({
-//           addresses: state.addresses.map((addr) => ({
-//             ...addr,
-//             isDefault: addr.id === addressId,
-//           })),
-//         }));
-//       },
-
-//       getDefaultAddress: () => {
-//         return get().addresses.find((addr) => addr.isDefault) || null;
-//       },
-//     }),
-//     {
-//       name: 'wearcraft-auth-storage',
-//     }
-//   )
-// );

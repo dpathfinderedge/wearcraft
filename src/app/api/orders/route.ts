@@ -5,8 +5,6 @@ import { nanoid } from 'nanoid';
 import prisma from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 import { successResponse, errorResponse, handleApiError, parseBody } from '@/lib/api-response';
-
-// Validation schema
 const createOrderSchema = z.object({
   items: z.array(z.object({
     productId: z.string(),
@@ -37,8 +35,6 @@ const createOrderSchema = z.object({
 });
 
 type CreateOrderInput = z.infer<typeof createOrderSchema>;
-
-// GET - Get user's orders
 export async function GET(request: NextRequest) {
   try {
     const authUser = await requireAuth(request);
@@ -59,19 +55,12 @@ export async function GET(request: NextRequest) {
     return handleApiError(error);
   }
 }
-
-// POST - Create new order
 export async function POST(request: NextRequest) {
   try {
     const authUser = await requireAuth(request);
     const body = await parseBody<CreateOrderInput>(request);
     const validatedData = createOrderSchema.parse(body);
-
-    // Generate order number
     const orderNumber = `ORD-${Date.now()}-${nanoid(6).toUpperCase()}`;
-
-    // The storefront can retain product IDs from its seeded catalog while the
-    // database uses generated IDs. Resolve each item before inserting the FK.
     const resolvedItems = await Promise.all(
       validatedData.items.map(async (item) => {
         const product = await prisma.product.findFirst({

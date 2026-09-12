@@ -13,7 +13,7 @@ export const HeroSection: React.FC = () => {
             <span className="font-normal">Made simple.</span>
           </h1>
           <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-2xl font-light">
-            Carefully curated wardrobe essentials designed for the way you live. 
+            Carefully curated wardrobe essentials designed for the way you live.
             Quality craftsmanship meets modern sensibility.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
@@ -31,7 +31,7 @@ export const HeroSection: React.FC = () => {
         </div>
       </div>
 
-      {/* Optional: Add subtle background pattern or gradient */}
+
       <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 right-0 w-96 h-96 bg-gray-100 rounded-full blur-3xl opacity-50" />
         <div className="absolute bottom-1/4 left-0 w-96 h-96 bg-gray-100 rounded-full blur-3xl opacity-50" />

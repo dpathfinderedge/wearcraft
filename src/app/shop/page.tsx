@@ -14,29 +14,20 @@ export default function ShopPage() {
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 200]);
   const [sortBy, setSortBy] = useState<SortOption>('featured');
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
-
-  // Filter products
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
-      // Search filter
       if (searchQuery && !product.name.toLowerCase().includes(searchQuery.toLowerCase())) {
         return false;
       }
-
-      // Category filter
       if (selectedCategory !== 'all' && product.category !== selectedCategory) {
         return false;
       }
-
-      // Size filter
       if (selectedSizes.length > 0) {
         const hasMatchingSize = product.sizes.some((size) =>
           selectedSizes.includes(size)
         );
         if (!hasMatchingSize) return false;
       }
-
-      // Price filter
       if (product.price < priceRange[0] || product.price > priceRange[1]) {
         return false;
       }
@@ -44,8 +35,6 @@ export default function ShopPage() {
       return true;
     });
   }, [searchQuery, selectedCategory, selectedSizes, priceRange]);
-
-  // Sort products
   const sortedProducts = useMemo(() => {
     const sorted = [...filteredProducts];
 
@@ -81,7 +70,7 @@ export default function ShopPage() {
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
+
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-light text-gray-900 mb-2">
             Shop All Products
@@ -91,7 +80,7 @@ export default function ShopPage() {
           </p>
         </div>
 
-        {/* Search and Sort Bar */}
+
         <div className="flex flex-col md:flex-row gap-4 mb-8">
           <div className="flex-1">
             <SearchBar
@@ -123,9 +112,9 @@ export default function ShopPage() {
           </div>
         </div>
 
-        {/* Main Content */}
+
         <div className="flex flex-col lg:flex-row gap-8">
-          {/* Desktop Sidebar */}
+
           <aside className="hidden lg:block w-64 flex-shrink-0">
             <div className="sticky top-20">
               <FilterSidebar
@@ -140,7 +129,7 @@ export default function ShopPage() {
             </div>
           </aside>
 
-          {/* Mobile Filters Modal */}
+
           {mobileFiltersOpen && (
             <div className="fixed inset-0 z-50 lg:hidden">
               <div
@@ -163,7 +152,7 @@ export default function ShopPage() {
             </div>
           )}
 
-          {/* Product Grid */}
+
           <div className="flex-1">
             <ProductGrid products={sortedProducts} />
           </div>

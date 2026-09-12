@@ -57,8 +57,6 @@ export async function PUT(
         isDefault: validatedData.isDefault ?? address.isDefault,
       },
     });
-
-    // Ensure default address stays unique
     if (validatedData.isDefault && !address.isDefault) {
       await prisma.address.updateMany({
         where: { userId: authUser.userId, id: { not: id } },

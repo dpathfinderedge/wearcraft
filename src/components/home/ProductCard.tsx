@@ -26,7 +26,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
   const wishlisted = isWishlisted(product);
 
-  const discount = product.originalPrice 
+  const discount = product.originalPrice
     ? calculateDiscount(product.originalPrice, product.price)
     : 0;
 
@@ -87,9 +87,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             {product.name}
           </h3>
 
-          <StarRating 
-            rating={product.rating} 
-            size={14} 
+          <StarRating
+            rating={product.rating}
+            size={14}
             reviewCount={product.reviewCount}
           />
 

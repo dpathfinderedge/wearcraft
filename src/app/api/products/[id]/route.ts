@@ -8,8 +8,6 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-
-    // Get product by ID or slug
     const product = await prisma.product.findFirst({
       where: {
         OR: [
