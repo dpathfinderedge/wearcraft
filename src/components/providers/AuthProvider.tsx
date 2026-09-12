@@ -5,13 +5,25 @@ import { useAuthStore } from '@/store/useAuthStore';
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const checkAuth = useAuthStore((state) => state.checkAuth);
-  const hasHydrated = useAuthStore((state) => state.hasHydrated);
 
   useEffect(() => {
-    if (hasHydrated) {
-      checkAuth();
+    let hasStarted = false;
+    const runAuthCheck = () => {
+      if (hasStarted) {
+        return;
+      }
+
+      hasStarted = true;
+      void checkAuth();
+    };
+
+    if (useAuthStore.persist.hasHydrated()) {
+      runAuthCheck();
     }
-  }, [checkAuth, hasHydrated]);
+
+    const unsubscribe = useAuthStore.persist.onFinishHydration(runAuthCheck);
+    return unsubscribe;
+  }, [checkAuth]);
 
   return <>{children}</>;
 }
