@@ -1,5 +1,3 @@
-// Frontend API client for making requests to backend
-
 import { Address, ApiAddress, ApiUser, UpdateProfileData } from '@/types/user';
 import { ApiOrder } from '@/types/order';
 import { mapAddressToApi } from '@/lib/mappers';
@@ -58,7 +56,6 @@ class ApiClient {
     }
   }
 
-  // Auth endpoints
   async signup(data: {
     email: string;
     password: string;
@@ -93,7 +90,6 @@ class ApiClient {
     return this.request<ApiUser>('/api/user/profile');
   }
 
-  // Product endpoints
   async getProducts(params?: {
     category?: string;
     search?: string;
@@ -124,7 +120,6 @@ class ApiClient {
     return this.request(`/api/products/${id}`);
   }
 
-  // Order endpoints
   async createOrder(data: {
     items: Array<{
       productId: string;
@@ -174,7 +169,6 @@ class ApiClient {
     return this.request<ApiOrder>(`/api/orders/${id}`);
   }
 
-  // User endpoints
   async updateProfile(data: UpdateProfileData): Promise<ApiResponse<ApiUser>> {
     return this.request<ApiUser>('/api/user/profile', {
       method: 'PUT',
@@ -218,7 +212,6 @@ class ApiClient {
     });
   }
 
-  // Review endpoints (for Phase 10)
   async createReview(productId: string, data: {
     rating: number;
     title?: string;
@@ -234,15 +227,14 @@ class ApiClient {
     return this.request(`/api/products/${productId}/reviews`);
   }
 
-  // Wishlist endpoints (for Phase 11)
-  async getWishlist() {
-    return this.request('/api/wishlist');
+  async getWishlist(): Promise<ApiResponse<unknown[]>> {
+    return this.request<unknown[]>('/api/wishlist');
   }
 
-  async addToWishlist(productId: string) {
+  async addToWishlist(productId: string, productName?: string) {
     return this.request('/api/wishlist', {
       method: 'POST',
-      body: JSON.stringify({ productId }),
+      body: JSON.stringify({ productId, productName }),
     });
   }
 
@@ -253,5 +245,4 @@ class ApiClient {
   }
 }
 
-// Export singleton instance
 export const apiClient = new ApiClient();

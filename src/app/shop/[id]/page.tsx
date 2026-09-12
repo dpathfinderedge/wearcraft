@@ -1,12 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { products } from '@/data/products';
 import { SizeSelector, ColorSelector } from '@/components/product';
 import { StarRating, Badge } from '@/components/common';
 import { Button } from '@/components/ui';
-import { useCartStore } from '@/store';
+import { useAuthStore, useCartStore, useWishlistStore } from '@/store';
 import { useToast } from '@/components/ui';
 import { formatPrice, calculateDiscount } from '@/lib/utils';
 import { Heart, Truck, Package, ShieldCheck } from 'lucide-react';
@@ -17,24 +17,21 @@ export default function ProductDetailPage() {
   const router = useRouter();
   const { showToast } = useToast();
   const { addItem } = useCartStore();
+  const { isAuthenticated, hasCheckedAuth } = useAuthStore();
+  const { hasLoaded, loadWishlist, isWishlisted, toggleWishlist } = useWishlistStore();
 
-  const product = products.find((p) => p.id === params.id);
+  const productKey = decodeURIComponent(String(params.id));
+  const product = products.find((p) => p.id === productKey || p.name === productKey);
 
-  const [selectedSize, setSelectedSize] = useState('');
-  const [selectedColor, setSelectedColor] = useState('');
+  const [selectedSize, setSelectedSize] = useState(product?.sizes[0] || '');
+  const [selectedColor, setSelectedColor] = useState(product?.colors[0] || '');
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
-  const [isWishlisted, setIsWishlisted] = useState(false);
-
-  // Set defaults on first render
-  React.useEffect(() => {
-    if (product && product.sizes.length > 0 && !selectedSize) {
-      setSelectedSize(product.sizes[0]);
+  useEffect(() => {
+    if (hasCheckedAuth && isAuthenticated && !hasLoaded) {
+      void loadWishlist();
     }
-    if (product && product.colors.length > 0 && !selectedColor) {
-      setSelectedColor(product.colors[0]);
-    }
-  }, [product, selectedSize, selectedColor]);
+  }, [hasCheckedAuth, hasLoaded, isAuthenticated, loadWishlist]);
 
   if (!product) {
     return (
@@ -73,7 +70,6 @@ export default function ProductDetailPage() {
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Breadcrumb */}
         <nav className="flex items-center space-x-2 text-sm text-gray-600 mb-8">
           <Link href="/" className="hover:text-gray-900">
             Home
@@ -87,9 +83,7 @@ export default function ProductDetailPage() {
         </nav>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Images */}
           <div>
-            {/* Main Image */}
             <div className="aspect-[3/4] bg-gray-100 mb-4 overflow-hidden">
               <img
                 src={product.images[selectedImage]}
@@ -98,7 +92,6 @@ export default function ProductDetailPage() {
               />
             </div>
 
-            {/* Thumbnail Images */}
             {product.images.length > 1 && (
               <div className="grid grid-cols-4 gap-4">
                 {product.images.map((image, index) => (
@@ -118,9 +111,7 @@ export default function ProductDetailPage() {
             )}
           </div>
 
-          {/* Product Info */}
           <div>
-            {/* Category & Badge */}
             <div className="flex items-center gap-3 mb-3">
               <p className="text-sm text-gray-500 uppercase tracking-wide">
                 {product.category}
@@ -128,12 +119,10 @@ export default function ProductDetailPage() {
               {discount > 0 && <Badge variant="error">{discount}% OFF</Badge>}
             </div>
 
-            {/* Product Name */}
             <h1 className="text-3xl md:text-4xl font-light text-gray-900 mb-4">
               {product.name}
             </h1>
 
-            {/* Rating */}
             <div className="mb-6">
               <StarRating
                 rating={product.rating}
@@ -143,7 +132,6 @@ export default function ProductDetailPage() {
               />
             </div>
 
-            {/* Price */}
             <div className="flex items-center gap-3 mb-6">
               <span className="text-3xl font-medium text-gray-900">
                 {formatPrice(product.price)}
@@ -155,10 +143,8 @@ export default function ProductDetailPage() {
               )}
             </div>
 
-            {/* Description */}
             <p className="text-gray-600 mb-8">{product.description}</p>
 
-            {/* Size Selector */}
             <div className="mb-6">
               <SizeSelector
                 sizes={product.sizes}
@@ -167,7 +153,6 @@ export default function ProductDetailPage() {
               />
             </div>
 
-            {/* Color Selector */}
             <div className="mb-8">
               <ColorSelector
                 colors={product.colors}
@@ -176,7 +161,6 @@ export default function ProductDetailPage() {
               />
             </div>
 
-            {/* Quantity */}
             <div className="mb-8">
               <h3 className="text-sm font-medium text-gray-900 mb-3">Quantity</h3>
               <div className="flex items-center gap-3">
@@ -196,7 +180,6 @@ export default function ProductDetailPage() {
               </div>
             </div>
 
-            {/* Add to Cart Buttons */}
             <div className="flex gap-3 mb-8">
               <Button
                 variant="primary"
@@ -210,16 +193,21 @@ export default function ProductDetailPage() {
               <Button
                 variant="outline"
                 size="lg"
-                onClick={() => setIsWishlisted(!isWishlisted)}
+                onClick={() => {
+                  if (!isAuthenticated) {
+                    router.push('/auth/login?redirect=/shop/' + product.id);
+                    return;
+                  }
+                  void toggleWishlist(product);
+                }}
               >
                 <Heart
                   size={20}
-                  className={isWishlisted ? 'fill-red-500 text-red-500' : ''}
+                  className={isWishlisted(product) ? 'fill-red-500 text-red-500' : ''}
                 />
               </Button>
             </div>
 
-            {/* Features */}
             <div className="border-t border-gray-200 pt-8 space-y-4">
               <div className="flex items-start gap-3">
                 <Truck size={20} className="text-gray-600 mt-0.5" strokeWidth={1.5} />
@@ -250,7 +238,6 @@ export default function ProductDetailPage() {
               </div>
             </div>
 
-            {/* Product Details */}
             {(product.material || product.care) && (
               <div className="border-t border-gray-200 mt-8 pt-8 space-y-4">
                 <h3 className="text-sm font-semibold text-gray-900 mb-4">
