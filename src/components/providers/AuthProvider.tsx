@@ -1,28 +1,19 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useAuthStore } from '@/store/useAuthStore';
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const checkAuth = useAuthStore((state) => state.checkAuth);
+  const hasStarted = useRef(false);
 
   useEffect(() => {
-    let hasStarted = false;
-    const runAuthCheck = () => {
-      if (hasStarted) {
-        return;
-      }
-
-      hasStarted = true;
-      void checkAuth();
-    };
-
-    if (useAuthStore.persist.hasHydrated()) {
-      runAuthCheck();
+    if (hasStarted.current) {
+      return;
     }
 
-    const unsubscribe = useAuthStore.persist.onFinishHydration(runAuthCheck);
-    return unsubscribe;
+    hasStarted.current = true;
+    void checkAuth();
   }, [checkAuth]);
 
   return <>{children}</>;
