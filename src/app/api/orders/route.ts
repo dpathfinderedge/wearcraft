@@ -70,50 +70,71 @@ export async function POST(request: NextRequest) {
     // Generate order number
     const orderNumber = `ORD-${Date.now()}-${nanoid(6).toUpperCase()}`;
 
-    // Create or find address
-    const address = await prisma.address.create({
-      data: {
+    // The storefront can retain product IDs from its seeded catalog while the
+    // database uses generated IDs. Resolve each item before inserting the FK.
+    const resolvedItems = await Promise.all(
+      validatedData.items.map(async (item) => {
+        const product = await prisma.product.findFirst({
+          where: {
+            OR: [
+              { id: item.productId },
+              { name: item.name },
+            ],
+          },
+          select: { id: true },
+        });
+
+        if (!product) {
+          throw new Error(`Product not found: ${item.name}`);
+        }
+
+        return { ...item, productId: product.id };
+      })
+    );
+
+    const order = await prisma.$transaction(async (transaction) => {
+      const address = await transaction.address.create({
+        data: {
+          userId: authUser.userId,
+          ...validatedData.address,
+        },
+      });
+
+      const orderData: Prisma.OrderUncheckedCreateInput = {
+        orderNumber,
         userId: authUser.userId,
-        ...validatedData.address,
-      },
-    });
+        addressId: address.id,
+        subtotal: validatedData.subtotal,
+        shipping: validatedData.shipping,
+        tax: validatedData.tax,
+        total: validatedData.total,
+        paymentMethod: validatedData.paymentMethod || 'paystack',
+        notes: validatedData.notes,
+        items: {
+          create: resolvedItems.map((item) => ({
+            productId: item.productId,
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity,
+            size: item.size,
+            color: item.color,
+            image: item.image,
+          })),
+        },
+      };
 
-    // Create order with items
-    const orderData: Prisma.OrderUncheckedCreateInput = {
-      orderNumber,
-      userId: authUser.userId,
-      addressId: address.id,
-      subtotal: validatedData.subtotal,
-      shipping: validatedData.shipping,
-      tax: validatedData.tax,
-      total: validatedData.total,
-      paymentMethod: validatedData.paymentMethod || 'paystack',
-      notes: validatedData.notes,
-      items: {
-        create: validatedData.items.map((item) => ({
-          productId: item.productId,
-          name: item.name,
-          price: item.price,
-          quantity: item.quantity,
-          size: item.size,
-          color: item.color,
-          image: item.image,
-        })),
-      },
-    };
+      if (validatedData.paymentReference) {
+        orderData.paymentRef = validatedData.paymentReference;
+        orderData.paymentStatus = 'PAID';
+      }
 
-    // If a payment reference was provided (e.g., after successful Paystack verification), mark as paid
-    if (validatedData.paymentReference) {
-      orderData.paymentRef = validatedData.paymentReference;
-      orderData.paymentStatus = 'PAID';
-    }
-
-    const order = await prisma.order.create({
-      data: orderData,
-      include: {
-        items: true,
-        address: true,
-      },
+      return transaction.order.create({
+        data: orderData,
+        include: {
+          items: true,
+          address: true,
+        },
+      });
     });
 
     return successResponse(order, 'Order created successfully', 201);
