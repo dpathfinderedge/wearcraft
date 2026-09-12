@@ -6,8 +6,6 @@ import { generateId, generateOrderNumber } from '@/lib/utils';
 interface OrderStore {
   orders: Order[];
   currentOrder: Order | null;
-  
-  // Actions
   createOrder: (
     userId: string,
     items: OrderItem[],

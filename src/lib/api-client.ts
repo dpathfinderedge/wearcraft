@@ -153,18 +153,18 @@ class ApiClient {
       body: JSON.stringify(data),
     });
   }
- 
+
   async verifyPaystackPayment(reference: string): Promise<ApiResponse<{ verified: boolean; reference: string }>> {
       return this.request<{ verified: boolean; reference: string }>('/api/paystack/verify', {
       method: 'POST',
       body: JSON.stringify({ reference }),
     });
   }
- 
+
   async getOrders(): Promise<ApiResponse<ApiOrder[]>> {
     return this.request<ApiOrder[]>('/api/orders');
   }
- 
+
   async getOrder(id: string): Promise<ApiResponse<ApiOrder>> {
     return this.request<ApiOrder>(`/api/orders/${id}`);
   }

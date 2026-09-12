@@ -15,8 +15,6 @@ export async function POST(request: NextRequest) {
     const paystackSecret = process.env.PAYSTACK_SECRET_KEY;
 
     if (!paystackSecret) {
-      // If running locally without a secret key configured, allow flows to continue
-      // by returning a simulated successful verification. In production, ensure PAYSTACK_SECRET_KEY is set.
       return successResponse({ verified: true, reference: body.reference }, 'Payment verification simulated');
     }
 
@@ -30,15 +28,11 @@ export async function POST(request: NextRequest) {
         },
       }
     );
-
-    // Ensure JSON parsing is safe
     const verificationData = await verificationResponse.json();
 
     if (!verificationResponse.ok || !verificationData.status) {
       return errorResponse('Payment verification failed', 402);
     }
-
-    // Paystack returns data.status as the transaction status; check for 'success'
     if (!verificationData.data || verificationData.data.status !== 'success') {
       return errorResponse('Payment not completed', 402);
     }

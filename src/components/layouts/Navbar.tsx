@@ -16,7 +16,7 @@ export const Navbar: React.FC = () => {
   );
   const { getItemCount } = useCartStore();
   const { user, isAuthenticated, logout } = useAuthStore();
-  
+
   const cartItemCount = mounted ? getItemCount() : 0;
 
   const handleLogout = async () => {

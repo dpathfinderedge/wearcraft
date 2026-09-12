@@ -1,15 +1,12 @@
-// Prisma Schema for WearCraft E-commerce
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql" // Change to "sqlite" for local development
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-
-// User Model
 model User {
   id            String    @id @default(cuid())
   email         String    @unique
@@ -19,17 +16,13 @@ model User {
   phone         String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-  
-  // Relations
   addresses     Address[]
   orders        Order[]
   reviews       Review[]
   wishlist      WishlistItem[]
-  
+
   @@index([email])
 }
-
-// Address Model
 model Address {
   id            String    @id @default(cuid())
   userId        String
@@ -44,15 +37,11 @@ model Address {
   isDefault     Boolean   @default(false)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-  
-  // Relations
   user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   orders        Order[]
-  
+
   @@index([userId])
 }
-
-// Product Model
 model Product {
   id            String    @id @default(cuid())
   name          String
@@ -61,11 +50,11 @@ model Product {
   price         Float
   comparePrice  Float?
   category      String
-  images        String[]  // Array of image URLs
-  sizes         String[]  // Available sizes
-  colors        String[]  // Available colors
-  material      String?   // Material composition
-  care          String?   // Care instructions
+  images        String[]
+  sizes         String[]
+  colors        String[]
+  material      String?
+  care          String?
   featured      Boolean   @default(false)
   inStock       Boolean   @default(true)
   stockCount    Int       @default(0)
@@ -73,18 +62,14 @@ model Product {
   reviewCount   Int       @default(0)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-  
-  // Relations
   reviews       Review[]
   orderItems    OrderItem[]
   wishlist      WishlistItem[]
-  
+
   @@index([category])
   @@index([slug])
   @@index([featured])
 }
-
-// Order Model
 model Order {
   id            String      @id @default(cuid())
   orderNumber   String      @unique
@@ -101,18 +86,14 @@ model Order {
   notes         String?     @db.Text
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
-  
-  // Relations
   user          User        @relation(fields: [userId], references: [id])
   address       Address     @relation(fields: [addressId], references: [id])
   items         OrderItem[]
-  
+
   @@index([userId])
   @@index([orderNumber])
   @@index([status])
 }
-
-// Order Items Model
 model OrderItem {
   id            String    @id @default(cuid())
   orderId       String
@@ -123,54 +104,42 @@ model OrderItem {
   size          String?
   color         String?
   image         String
-  
-  // Relations
   order         Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
   product       Product   @relation(fields: [productId], references: [id])
-  
+
   @@index([orderId])
   @@index([productId])
 }
-
-// Review Model
 model Review {
   id            String    @id @default(cuid())
   userId        String
   productId     String
-  rating        Int       // 1-5
+  rating        Int
   title         String?
   comment       String    @db.Text
-  verified      Boolean   @default(false) // Verified purchase
-  helpful       Int       @default(0)     // Helpful count
+  verified      Boolean   @default(false)
+  helpful       Int       @default(0)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-  
-  // Relations
   user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   product       Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
-  
-  @@unique([userId, productId]) // One review per user per product
+
+  @@unique([userId, productId])
   @@index([productId])
   @@index([userId])
 }
-
-// Wishlist Model
 model WishlistItem {
   id            String    @id @default(cuid())
   userId        String
   productId     String
   createdAt     DateTime  @default(now())
-  
-  // Relations
   user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   product       Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
-  
-  @@unique([userId, productId]) // Prevent duplicates
+
+  @@unique([userId, productId])
   @@index([userId])
   @@index([productId])
 }
-
-// Enums
 enum OrderStatus {
   PENDING
   PROCESSING

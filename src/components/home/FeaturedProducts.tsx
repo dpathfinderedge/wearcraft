@@ -18,7 +18,7 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
   return (
     <section className="py-16 md:py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
+
         <div className="flex justify-between items-end mb-12">
           <div>
             <h2 className="text-3xl md:text-4xl font-light text-gray-900 mb-2">
@@ -33,14 +33,14 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
           </Link>
         </div>
 
-        {/* Products Grid */}
+
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8">
           {products.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>
 
-        {/* Mobile View All Button */}
+
         <div className="mt-12 text-center md:hidden">
           <Link href="/shop">
             <Button variant="outline" className="w-full sm:w-auto">

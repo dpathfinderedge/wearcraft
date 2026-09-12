@@ -1,10 +1,6 @@
 import { Address, ApiAddress, ApiUser } from '@/types/user';
 
-/**
- * Maps our Address type to API Address format
- * Frontend uses: street, postalCode
- * Backend uses: address, zipCode
- */
+
 export function mapAddressToApi(address: Address) {
   return {
     firstName: address.firstName,
@@ -19,9 +15,7 @@ export function mapAddressToApi(address: Address) {
   };
 }
 
-/**
- * Maps API Address to our Address type
- */
+
 export function mapAddressFromApi(apiAddress: ApiAddress): Address {
   return {
     id: String(apiAddress.id),
@@ -37,9 +31,7 @@ export function mapAddressFromApi(apiAddress: ApiAddress): Address {
   };
 }
 
-/**
- * Maps API User to our User type
- */
+
 export function mapUserFromApi(apiUser: ApiUser) {
   return {
     id: String(apiUser.id),

@@ -5,10 +5,7 @@ import { successResponse, errorResponse, handleApiError } from '@/lib/api-respon
 
 export async function GET(request: NextRequest) {
   try {
-    // Require authentication
     const authUser = await requireAuth(request);
-
-    // Get user from database
     const user = await prisma.user.findUnique({
       where: { id: authUser.userId },
       select: {

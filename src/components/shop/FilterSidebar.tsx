@@ -46,7 +46,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
 
   return (
     <div className="bg-white">
-      {/* Mobile Header */}
+
       {isMobile && (
         <div className="flex items-center justify-between p-4 border-b border-gray-200">
           <h2 className="text-lg font-semibold">Filters</h2>
@@ -57,7 +57,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
       )}
 
       <div className="p-6 space-y-8">
-        {/* Clear Filters */}
+
         {hasActiveFilters && (
           <Button
             variant="outline"
@@ -69,7 +69,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
           </Button>
         )}
 
-        {/* Categories */}
+
         <div>
           <h3 className="text-sm font-semibold text-gray-900 mb-4">Category</h3>
           <div className="space-y-2">
@@ -89,7 +89,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
           </div>
         </div>
 
-        {/* Sizes */}
+
         <div>
           <h3 className="text-sm font-semibold text-gray-900 mb-4">Size</h3>
           <div className="grid grid-cols-3 gap-2">
@@ -109,7 +109,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
           </div>
         </div>
 
-        {/* Price Range */}
+
         <div>
           <h3 className="text-sm font-semibold text-gray-900 mb-4">Price Range</h3>
           <div className="space-y-4">

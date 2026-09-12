@@ -27,7 +27,7 @@ export const CartSummary: React.FC<CartSummaryProps> = ({
     <div className="bg-gray-50 rounded-sm p-6">
       <h2 className="text-lg font-semibold text-gray-900 mb-6">Order Summary</h2>
 
-      {/* Free Shipping Progress */}
+
       {subtotal > 0 && subtotal < freeShippingThreshold && (
         <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-sm">
           <div className="flex items-start gap-2">
@@ -51,7 +51,7 @@ export const CartSummary: React.FC<CartSummaryProps> = ({
         </div>
       )}
 
-      {/* Summary Items */}
+
       <div className="space-y-3 mb-6">
         <div className="flex justify-between text-sm">
           <span className="text-gray-600">
@@ -71,7 +71,7 @@ export const CartSummary: React.FC<CartSummaryProps> = ({
         </div>
       </div>
 
-      {/* Total */}
+
       <div className="border-t border-gray-200 pt-4 mb-6">
         <div className="flex justify-between">
           <span className="text-base font-semibold text-gray-900">Total</span>
@@ -79,7 +79,7 @@ export const CartSummary: React.FC<CartSummaryProps> = ({
         </div>
       </div>
 
-      {/* Checkout Button */}
+
       <Link href="/checkout">
         <Button variant="primary" size="lg" className="w-full mb-3">
           Proceed to Checkout

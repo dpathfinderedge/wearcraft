@@ -1,4 +1,3 @@
-// Export all home components
 export { HeroSection } from './HeroSection';
 export { ProductCard } from './ProductCard';
 export { FeaturedProducts } from './FeaturedProducts';

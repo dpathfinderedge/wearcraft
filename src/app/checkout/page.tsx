@@ -96,7 +96,7 @@ export default function CheckoutPage() {
       paymentReference: paymentReference,
       notes: paymentReference ? `Paystack reference: ${paymentReference}` : undefined,
     });
- 
+
     return orderResponse;
   };
 

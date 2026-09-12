@@ -34,9 +34,9 @@ export const Footer: React.FC = () => {
   return (
     <footer className="bg-white border-t border-gray-200 mt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Main Footer Content */}
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-8">
-          {/* Brand Column */}
+
           <div className="lg:col-span-2">
             <Link href="/" className="text-xl font-semibold tracking-tight text-gray-900">
               WearCraft
@@ -64,7 +64,7 @@ export const Footer: React.FC = () => {
             </div>
           </div>
 
-          {/* Shop Links */}
+
           <div>
             <h3 className="text-sm font-semibold text-gray-900 mb-4">Shop</h3>
             <ul className="space-y-2">
@@ -81,7 +81,7 @@ export const Footer: React.FC = () => {
             </ul>
           </div>
 
-          {/* Company Links */}
+
           <div>
             <h3 className="text-sm font-semibold text-gray-900 mb-4">Company</h3>
             <ul className="space-y-2">
@@ -98,7 +98,7 @@ export const Footer: React.FC = () => {
             </ul>
           </div>
 
-          {/* Support Links */}
+
           <div>
             <h3 className="text-sm font-semibold text-gray-900 mb-4">Support</h3>
             <ul className="space-y-2">
@@ -116,32 +116,10 @@ export const Footer: React.FC = () => {
           </div>
         </div>
 
-        {/* Newsletter */}
-        {/* <div className="border-t border-gray-200 pt-8 mb-8">
-          <div className="max-w-md">
-            <h3 className="text-sm font-semibold text-gray-900 mb-2">
-              Subscribe to our newsletter
-            </h3>
-            <p className="text-sm text-gray-600 mb-4">
-              Get updates on new arrivals and exclusive offers.
-            </p>
-            <form className="flex gap-2">
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-sm text-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900"
-              />
-              <button
-                type="submit"
-                className="px-6 py-2 bg-gray-900 text-white text-sm font-medium rounded-sm hover:bg-gray-800 transition"
-              >
-                Subscribe
-              </button>
-            </form>
-          </div>
-        </div> */}
 
-        {/* Bottom Bar */}
+
+
+
         <div className="border-t border-gray-200 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-sm text-gray-600">
             © {currentYear} WearCraft. All rights reserved.

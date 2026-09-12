@@ -2,8 +2,6 @@ import { SignJWT, jwtVerify, type JWTPayload as JoseJWTPayload } from 'jose';
 import { cookies } from 'next/headers';
 import { NextRequest } from 'next/server';
 import bcrypt from 'bcryptjs';
-
-// JWT Configuration
 const JWT_SECRET = new TextEncoder().encode(
   process.env.JWT_SECRET || 'your-super-secret-jwt-key'
 );
@@ -14,21 +12,15 @@ export interface JWTPayload extends JoseJWTPayload {
   userId: string;
   email: string;
 }
-
-// Hash password
 export async function hashPassword(password: string): Promise<string> {
   return bcrypt.hash(password, 12);
 }
-
-// Verify password
 export async function verifyPassword(
   password: string,
   hashedPassword: string
 ): Promise<boolean> {
   return bcrypt.compare(password, hashedPassword);
 }
-
-// Create JWT token
 export async function createToken(payload: JWTPayload): Promise<string> {
   const token = await new SignJWT(payload)
     .setProtectedHeader({ alg: 'HS256' })
@@ -38,8 +30,6 @@ export async function createToken(payload: JWTPayload): Promise<string> {
 
   return token;
 }
-
-// Verify JWT token
 export async function verifyToken(token: string): Promise<JWTPayload | null> {
   try {
     const { payload } = await jwtVerify(token, JWT_SECRET);
@@ -49,8 +39,6 @@ export async function verifyToken(token: string): Promise<JWTPayload | null> {
     return null;
   }
 }
-
-// Set auth cookie
 export async function setAuthCookie(token: string): Promise<void> {
   (await cookies()).set(TOKEN_NAME, token, {
     httpOnly: true,
@@ -60,18 +48,12 @@ export async function setAuthCookie(token: string): Promise<void> {
     path: '/',
   });
 }
-
-// Get auth cookie
 export async function getAuthCookie(): Promise<string | undefined> {
   return (await cookies()).get(TOKEN_NAME)?.value;
 }
-
-// Remove auth cookie
 export async function removeAuthCookie(): Promise<void> {
   (await cookies()).delete(TOKEN_NAME);
 }
-
-// Get current user from request
 export async function getCurrentUser(
   request?: NextRequest
 ): Promise<JWTPayload | null> {
@@ -79,10 +61,8 @@ export async function getCurrentUser(
     let token: string | undefined;
 
     if (request) {
-      // Get from request cookie
       token = request.cookies.get(TOKEN_NAME)?.value;
     } else {
-      // Get from Next.js cookies
       token = await getAuthCookie();
     }
 
@@ -94,16 +74,14 @@ export async function getCurrentUser(
     return null;
   }
 }
-
-// Require authentication (for API routes)
 export async function requireAuth(
   request: NextRequest
 ): Promise<JWTPayload> {
   const user = await getCurrentUser(request);
-  
+
   if (!user) {
     throw new Error('Unauthorized');
   }
-  
+
   return user;
 }

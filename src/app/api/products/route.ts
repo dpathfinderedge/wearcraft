@@ -6,8 +6,6 @@ import { successResponse, handleApiError } from '@/lib/api-response';
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    
-    // Get query parameters
     const category = searchParams.get('category');
     const search = searchParams.get('search');
     const minPrice = searchParams.get('minPrice');
@@ -17,8 +15,6 @@ export async function GET(request: NextRequest) {
     const sort = searchParams.get('sort') || 'featured';
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '20');
-
-    // Build where clause
     const where: Prisma.ProductWhereInput = {
       inStock: true,
     };
@@ -49,8 +45,6 @@ export async function GET(request: NextRequest) {
     if (featured === 'true') {
       where.featured = true;
     }
-
-    // Build orderBy clause
     let orderBy: Prisma.ProductOrderByWithRelationInput;
     switch (sort) {
       case 'price-asc':
@@ -68,8 +62,6 @@ export async function GET(request: NextRequest) {
       default:
         orderBy = { featured: 'desc' };
     }
-
-    // Get products with pagination
     const [products, total] = await Promise.all([
       prisma.product.findMany({
         where,

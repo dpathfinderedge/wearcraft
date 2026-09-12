@@ -3,8 +3,6 @@ import { z } from 'zod';
 import prisma from '@/lib/prisma';
 import { hashPassword, createToken, setAuthCookie } from '@/lib/auth';
 import { successResponse, errorResponse, handleApiError } from '@/lib/api-response';
-
-// Validation schema
 const signupSchema = z.object({
   email: z.string().email('Invalid email address'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
@@ -15,18 +13,13 @@ const signupSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
-    // Parse request body
     let body: unknown;
     try {
       body = await request.json();
     } catch {
       return errorResponse('Invalid JSON in request body', 400);
     }
-
-    // Validate input
     const validatedData = signupSchema.parse(body);
-
-    // Check if user already exists
     const existingUser = await prisma.user.findUnique({
       where: { email: validatedData.email },
     });
@@ -34,11 +27,7 @@ export async function POST(request: NextRequest) {
     if (existingUser) {
       return errorResponse('User with this email already exists', 409);
     }
-
-    // Hash password
     const hashedPassword = await hashPassword(validatedData.password);
-
-    // Create user
     const user = await prisma.user.create({
       data: {
         email: validatedData.email,
@@ -56,14 +45,10 @@ export async function POST(request: NextRequest) {
         createdAt: true,
       },
     });
-
-    // Create JWT token
     const token = await createToken({
       userId: user.id,
       email: user.email,
     });
-
-    // Set cookie
     await setAuthCookie(token);
 
     return successResponse(
@@ -78,7 +63,7 @@ export async function POST(request: NextRequest) {
     if (error instanceof z.ZodError) {
       const issues = error.issues || [];
       const firstError = issues[0];
-      
+
       if (firstError && firstError.message) {
         return errorResponse(firstError.message, 400);
       }

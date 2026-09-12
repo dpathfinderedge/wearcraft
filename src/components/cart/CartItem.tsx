@@ -35,7 +35,7 @@ export const CartItem: React.FC<CartItemProps> = ({ item }) => {
 
   return (
     <div className="flex gap-4 py-6 border-b border-gray-200">
-      {/* Product Image */}
+
       <Link
         href={`/shop/${item.product.id}`}
         className="flex-shrink-0 w-24 h-32 bg-gray-100 overflow-hidden"
@@ -47,7 +47,7 @@ export const CartItem: React.FC<CartItemProps> = ({ item }) => {
         />
       </Link>
 
-      {/* Product Info */}
+
       <div className="flex-1 flex flex-col">
         <div className="flex justify-between mb-2">
           <div>
@@ -66,7 +66,7 @@ export const CartItem: React.FC<CartItemProps> = ({ item }) => {
           </p>
         </div>
 
-        {/* Quantity Controls and Remove */}
+
         <div className="flex items-center justify-between mt-auto">
           <div className="flex items-center gap-2">
             <button
