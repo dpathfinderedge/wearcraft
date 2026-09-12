@@ -22,9 +22,13 @@ class ApiClient {
     endpoint: string,
     options?: RequestInit
   ): Promise<ApiResponse<T>> {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
+
     try {
       const response = await fetch(`${this.baseUrl}${endpoint}`, {
         ...options,
+        signal: options?.signal || controller.signal,
         headers: {
           'Content-Type': 'application/json',
           ...options?.headers,
@@ -43,8 +47,14 @@ class ApiClient {
       console.error('API Error:', error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'An error occurred',
+        error: error instanceof DOMException && error.name === 'AbortError'
+          ? 'The request timed out. Please try again.'
+          : error instanceof Error
+            ? error.message
+            : 'An error occurred',
       };
+    } finally {
+      clearTimeout(timeout);
     }
   }
 

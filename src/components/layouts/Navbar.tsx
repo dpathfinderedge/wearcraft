@@ -2,10 +2,12 @@
 
 import React, { useState, useSyncExternalStore } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { ShoppingCart, User, Menu, X, Search } from 'lucide-react';
 import { useCartStore, useAuthStore } from '@/store';
 
 export const Navbar: React.FC = () => {
+  const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const mounted = useSyncExternalStore(
     () => () => undefined,
@@ -16,6 +18,11 @@ export const Navbar: React.FC = () => {
   const { user, isAuthenticated, logout } = useAuthStore();
   
   const cartItemCount = mounted ? getItemCount() : 0;
+
+  const handleLogout = async () => {
+    await logout();
+    router.push('/');
+  };
 
   const navigation = [
     { name: 'Shop', href: '/shop' },
@@ -86,7 +93,7 @@ export const Navbar: React.FC = () => {
                     Order History
                   </Link>
                   <button
-                    onClick={logout}
+                    onClick={() => void handleLogout()}
                     className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-50"
                   >
                     Logout

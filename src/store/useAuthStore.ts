@@ -8,6 +8,8 @@ interface AuthStore {
   user: User | null;
   addresses: Address[];
   isAuthenticated: boolean;
+  hasHydrated: boolean;
+  hasCheckedAuth: boolean;
   isLoading: boolean;
   error: string | null;
   
@@ -36,6 +38,8 @@ export const useAuthStore = create<AuthStore>()(
       user: null,
       addresses: [],
       isAuthenticated: false,
+      hasHydrated: false,
+      hasCheckedAuth: false,
       isLoading: false,
       error: null,
 
@@ -57,6 +61,7 @@ export const useAuthStore = create<AuthStore>()(
               user: mappedUser,
               addresses,
               isAuthenticated: true,
+              hasCheckedAuth: true,
               isLoading: false,
             });
 
@@ -153,6 +158,7 @@ export const useAuthStore = create<AuthStore>()(
               user: mappedUser,
               addresses,
               isAuthenticated: true,
+              hasCheckedAuth: true,
               isLoading: false,
             });
             return;
@@ -162,6 +168,7 @@ export const useAuthStore = create<AuthStore>()(
             user: null,
             addresses: [],
             isAuthenticated: false,
+            hasCheckedAuth: true,
             isLoading: false,
           });
         } catch {
@@ -169,6 +176,7 @@ export const useAuthStore = create<AuthStore>()(
             user: null,
             addresses: [],
             isAuthenticated: false,
+            hasCheckedAuth: true,
             isLoading: false,
           });
         }
@@ -351,6 +359,9 @@ export const useAuthStore = create<AuthStore>()(
         addresses: state.addresses,
         isAuthenticated: state.isAuthenticated,
       }),
+      onRehydrateStorage: () => () => {
+        useAuthStore.setState({ hasHydrated: true });
+      },
     }
   )
 );
