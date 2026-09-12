@@ -37,6 +37,7 @@ export default function OrdersPage() {
   const { user, isAuthenticated, hasHydrated } = useAuthStore();
   const [orders, setOrders] = useState<OrderListItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!hasHydrated) {
@@ -49,13 +50,23 @@ export default function OrdersPage() {
     }
 
     const fetchOrders = async () => {
-      const response = await apiClient.getOrders();
-      if (response.success && response.data) {
-        setOrders(response.data as OrderListItem[]);
-      } else {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const response = await apiClient.getOrders();
+        if (response.success && response.data) {
+          setOrders(response.data as OrderListItem[]);
+        } else {
+          setOrders([]);
+          setError(response.error || 'Unable to load your orders.');
+        }
+      } catch (requestError) {
         setOrders([]);
+        setError(requestError instanceof Error ? requestError.message : 'Unable to load your orders.');
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     fetchOrders();
@@ -97,6 +108,17 @@ export default function OrdersPage() {
         {loading ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <div className="text-sm text-gray-600">Loading orders...</div>
+          </div>
+        ) : error ? (
+          <div className="flex flex-col items-center justify-center py-16 text-center">
+            <p className="text-sm text-red-700">{error}</p>
+            <button
+              type="button"
+              onClick={() => window.location.reload()}
+              className="mt-4 text-sm font-medium text-gray-900 underline underline-offset-4"
+            >
+              Try again
+            </button>
           </div>
         ) : orders.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
@@ -169,7 +191,7 @@ export default function OrdersPage() {
                     {order.items.slice(0, 4).map((item: OrderSummaryItem, index: number) => (
                       <div
                         key={index}
-                        className="relative flex-shrink-0 w-16 h-20 bg-gray-100 overflow-hidden"
+                        className="relative shrink-0 w-16 h-20 bg-gray-100 overflow-hidden"
                       >
                         <Image
                           src={item.image}
@@ -181,7 +203,7 @@ export default function OrdersPage() {
                       </div>
                     ))}
                     {order.items.length > 4 && (
-                      <div className="flex-shrink-0 w-16 h-20 bg-gray-100 flex items-center justify-center">
+                      <div className="shrink-0 w-16 h-20 bg-gray-100 flex items-center justify-center">
                         <span className="text-sm text-gray-600 font-medium">
                           +{order.items.length - 4}
                         </span>
