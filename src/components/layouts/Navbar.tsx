@@ -29,15 +29,16 @@ export const Navbar: React.FC = () => {
     { name: 'Men', href: '/shop?category=mens' },
     { name: 'Women', href: '/shop?category=womens' },
     { name: 'Accessories', href: '/shop?category=accessories' },
+    { name: 'Contact', href: '/contact' },
   ];
 
   return (
-    <nav className="bg-white border-b border-gray-200 sticky top-0 z-40">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+    <nav className="sticky top-0 z-40 border-b border-line bg-[#f8f7f3]/95 backdrop-blur">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex h-[4.5rem] items-center justify-between">
           <div className="flex items-center">
-            <Link href="/" className="text-xl font-semibold tracking-tight text-gray-900">
-              WearCraft
+            <Link href="/" className="text-xl font-semibold tracking-[-0.04em] text-ink">
+              Wear<span className="text-olive">Craft</span>
             </Link>
           </div>
 
@@ -46,7 +47,7 @@ export const Navbar: React.FC = () => {
               <Link
                 key={item.name}
                 href={item.href}
-                className="text-sm font-medium text-gray-700 hover:text-gray-900 transition"
+                className="text-xs font-medium uppercase tracking-[0.12em] text-muted transition-colors hover:text-ink"
               >
                 {item.name}
               </Link>
@@ -55,13 +56,13 @@ export const Navbar: React.FC = () => {
 
           <div className="flex items-center space-x-4">
             <button className="hidden md:block p-2 text-gray-700 hover:text-gray-900 transition">
-              <Search size={20} strokeWidth={1.5} />
+              <Search size={19} strokeWidth={1.5} />
             </button>
 
-            <Link href="/cart" className="relative p-2 text-gray-700 hover:text-gray-900 transition">
+            <Link href="/cart" aria-label="Shopping cart" className="relative p-2 text-muted transition-colors hover:text-ink">
               <ShoppingCart size={20} strokeWidth={1.5} />
               {mounted && cartItemCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-gray-900 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium">
+                <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-olive text-xs font-medium text-white">
                   {cartItemCount}
                 </span>
               )}
@@ -70,8 +71,8 @@ export const Navbar: React.FC = () => {
             {mounted && isAuthenticated && user ? (
               <div className="relative group">
                 <button className="hidden md:flex items-center space-x-2 p-2 text-gray-700 hover:text-gray-900 transition">
-                  <User size={20} strokeWidth={1.5} />
-                  <span className="text-sm font-medium">{user.name}</span>
+                  <User size={19} strokeWidth={1.5} />
+                  <span className="text-sm font-medium text-ink">{user.name}</span>
                 </button>
                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-sm shadow-lg py-2 hidden group-hover:block border border-gray-200">
                   <Link

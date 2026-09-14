@@ -49,7 +49,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
 
       {isMobile && (
         <div className="flex items-center justify-between p-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold">Filters</h2>
+          <h2 className="text-lg font-semibold text-ink">Filters</h2>
           <button onClick={onClose} className="p-2">
             <X size={20} />
           </button>
@@ -71,7 +71,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
 
 
         <div>
-          <h3 className="text-sm font-semibold text-gray-900 mb-4">Category</h3>
+          <h3 className="mb-4 text-xs font-semibold uppercase tracking-[0.14em] text-ink">Category</h3>
           <div className="space-y-2">
             {categories.map((category) => (
               <button
@@ -79,8 +79,8 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                 onClick={() => onCategoryChange(category.value)}
                 className={`block w-full text-left px-3 py-2 text-sm rounded-sm transition ${
                   selectedCategory === category.value
-                    ? 'bg-gray-900 text-white'
-                    : 'text-gray-700 hover:bg-gray-50'
+                    ? 'bg-[#80533f] text-white'
+                    : 'text-muted hover:bg-[#f8f7f3]'
                 }`}
               >
                 {category.label}
@@ -91,7 +91,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
 
 
         <div>
-          <h3 className="text-sm font-semibold text-gray-900 mb-4">Size</h3>
+          <h3 className="mb-4 text-xs font-semibold uppercase tracking-[0.14em] text-ink">Size</h3>
           <div className="grid grid-cols-3 gap-2">
             {sizes.map((size) => (
               <button
@@ -99,8 +99,8 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                 onClick={() => onSizeToggle(size)}
                 className={`px-3 py-2 text-sm border rounded-sm transition ${
                   selectedSizes.includes(size)
-                    ? 'border-gray-900 bg-gray-900 text-white'
-                    : 'border-gray-300 text-gray-700 hover:border-gray-900'
+                    ? 'border-[#80533f] bg-[#80533f] text-white'
+                    : 'border-line text-muted hover:border-[#80533f]'
                 }`}
               >
                 {size}
@@ -111,7 +111,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
 
 
         <div>
-          <h3 className="text-sm font-semibold text-gray-900 mb-4">Price Range</h3>
+          <h3 className="mb-4 text-xs font-semibold uppercase tracking-[0.14em] text-ink">Price Range</h3>
           <div className="space-y-4">
             <div className="flex items-center justify-between text-sm text-gray-600">
               <span>${priceRange[0]}</span>

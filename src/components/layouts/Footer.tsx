@@ -32,33 +32,31 @@ export const Footer: React.FC = () => {
   };
 
   return (
-    <footer className="bg-white border-t border-gray-200 mt-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-8">
-
+    <footer className="mt-20 border-t border-line bg-[#eeede7]">
+      <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+        <div className="mb-12 grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-5">
           <div className="lg:col-span-2">
-            <Link href="/" className="text-xl font-semibold tracking-tight text-gray-900">
-              WearCraft
+            <Link href="/" className="text-2xl font-semibold tracking-[-0.04em] text-ink">
+              Wear<span className="text-olive">Craft</span>
             </Link>
-            <p className="mt-4 text-sm text-gray-600 max-w-md">
-              Timeless style made simple. Carefully curated wardrobe essentials designed for the way you live.
+            <p className="mt-5 max-w-md text-sm leading-6 text-muted">
+              Thoughtful wardrobe essentials for everyday life, selected with a slower and more considered eye.
             </p>
-            <div className="mt-6 space-y-2">
-              <div className="flex items-center text-sm text-gray-600">
-                <Mail size={16} className="mr-2" strokeWidth={1.5} />
-                <a href="mailto:hello@wearcraft.com" className="hover:text-gray-900">
+            <div className="mt-7 space-y-3">
+              <div className="flex items-center text-sm text-muted">
+                <Mail size={16} className="mr-3 text-olive" strokeWidth={1.5} />
+                <a href="mailto:hello@wearcraft.com" className="transition-colors hover:text-ink">
                   hello@wearcraft.com
                 </a>
               </div>
-              <div className="flex items-center text-sm text-gray-600">
-                <Phone size={16} className="mr-2" strokeWidth={1.5} />
-                <a href="tel:+1234567890" className="hover:text-gray-900">
+              <div className="flex items-center text-sm text-muted">
+                <Phone size={16} className="mr-3 text-olive" strokeWidth={1.5} />
+                <a href="tel:+1234567890" className="transition-colors hover:text-ink">
                   +1 (234) 567-890
                 </a>
               </div>
-              <div className="flex items-center text-sm text-gray-600">
-                <MapPin size={16} className="mr-2" strokeWidth={1.5} />
+              <div className="flex items-center text-sm text-muted">
+                <MapPin size={16} className="mr-3 text-olive" strokeWidth={1.5} />
                 <span>Lagos, Nigeria</span>
               </div>
             </div>
@@ -66,13 +64,13 @@ export const Footer: React.FC = () => {
 
 
           <div>
-            <h3 className="text-sm font-semibold text-gray-900 mb-4">Shop</h3>
-            <ul className="space-y-2">
+            <h3 className="mb-4 text-xs font-semibold uppercase tracking-[0.15em] text-ink">Shop</h3>
+            <ul className="space-y-3">
               {footerLinks.shop.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.href}
-                    className="text-sm text-gray-600 hover:text-gray-900 transition"
+                    className="text-sm text-muted transition-colors hover:text-ink"
                   >
                     {link.name}
                   </Link>
@@ -83,13 +81,13 @@ export const Footer: React.FC = () => {
 
 
           <div>
-            <h3 className="text-sm font-semibold text-gray-900 mb-4">Company</h3>
-            <ul className="space-y-2">
+            <h3 className="mb-4 text-xs font-semibold uppercase tracking-[0.15em] text-ink">Company</h3>
+            <ul className="space-y-3">
               {footerLinks.company.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.href}
-                    className="text-sm text-gray-600 hover:text-gray-900 transition"
+                    className="text-sm text-muted transition-colors hover:text-ink"
                   >
                     {link.name}
                   </Link>
@@ -100,13 +98,13 @@ export const Footer: React.FC = () => {
 
 
           <div>
-            <h3 className="text-sm font-semibold text-gray-900 mb-4">Support</h3>
-            <ul className="space-y-2">
+            <h3 className="mb-4 text-xs font-semibold uppercase tracking-[0.15em] text-ink">Support</h3>
+            <ul className="space-y-3">
               {footerLinks.support.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.href}
-                    className="text-sm text-gray-600 hover:text-gray-900 transition"
+                    className="text-sm text-muted transition-colors hover:text-ink"
                   >
                     {link.name}
                   </Link>
@@ -120,16 +118,16 @@ export const Footer: React.FC = () => {
 
 
 
-        <div className="border-t border-gray-200 pt-8 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-sm text-gray-600">
+        <div className="flex flex-col items-center justify-between gap-4 border-t border-line pt-7 md:flex-row">
+          <p className="text-sm text-muted">
             © {currentYear} WearCraft. All rights reserved.
           </p>
-          <div className="flex space-x-6 mt-4 md:mt-0">
+          <div className="mt-4 flex gap-6 md:mt-0">
             {footerLinks.legal.map((link) => (
               <Link
                 key={link.name}
                 href={link.href}
-                className="text-sm text-gray-600 hover:text-gray-900 transition"
+                className="text-sm text-muted transition-colors hover:text-ink"
               >
                 {link.name}
               </Link>

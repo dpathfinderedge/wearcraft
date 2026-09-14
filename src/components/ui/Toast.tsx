@@ -44,7 +44,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   return (
     <ToastContext.Provider value={{ showToast }}>
       {children}
-      <div className="fixed top-4 right-4 z-50 space-y-2">
+      <div className="fixed inset-x-4 top-4 z-50 space-y-2 sm:left-auto sm:right-4 sm:w-[min(calc(100vw-2rem),24rem)]">
         {toasts.map((toast) => (
           <ToastItem key={toast.id} toast={toast} onClose={() => removeToast(toast.id)} />
         ))}
@@ -60,30 +60,32 @@ interface ToastItemProps {
 
 const ToastItem: React.FC<ToastItemProps> = ({ toast, onClose }) => {
   const icons = {
-    success: <CheckCircle className="text-green-600" size={20} />,
-    error: <AlertCircle className="text-red-600" size={20} />,
-    warning: <AlertTriangle className="text-yellow-600" size={20} />,
-    info: <Info className="text-blue-600" size={20} />,
+    success: <CheckCircle className="text-olive" size={20} />,
+    error: <AlertCircle className="text-clay" size={20} />,
+    warning: <AlertTriangle className="text-amber-600" size={20} />,
+    info: <Info className="text-sky-700" size={20} />,
   };
 
   const styles = {
-    success: 'bg-green-50 border-green-200',
-    error: 'bg-red-50 border-red-200',
-    warning: 'bg-yellow-50 border-yellow-200',
-    info: 'bg-blue-50 border-blue-200',
+    success: 'bg-[#eef3ec] border-[#cbd8c8]',
+    error: 'bg-[#fbefeb] border-[#e8c9bd]',
+    warning: 'bg-[#fbf5e5] border-[#ead9a8]',
+    info: 'bg-[#edf4f7] border-[#c6dce4]',
   };
 
   return (
     <div
       className={cn(
-        'flex items-center gap-3 min-w-[300px] max-w-md p-4 rounded-sm border shadow-lg',
-        'animate-slide-down',
+        'flex items-center gap-3 min-w-0 p-4 border shadow-lg',
+        'animate-toast-in',
         styles[toast.type]
       )}
     >
       <div className="flex-shrink-0">{icons[toast.type]}</div>
       <p className="flex-1 text-sm text-gray-900">{toast.message}</p>
       <button
+        type="button"
+        aria-label="Dismiss notification"
         onClick={onClose}
         className="flex-shrink-0 text-gray-400 hover:text-gray-600 transition"
       >

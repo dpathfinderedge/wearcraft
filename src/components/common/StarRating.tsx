@@ -60,8 +60,8 @@ export const StarRating: React.FC<StarRatingProps> = ({
                 className={cn(
                   'transition-colors',
                   isFilled
-                    ? 'fill-gray-900 text-gray-900'
-                    : 'fill-none text-gray-300'
+                    ? 'fill-[#80533f] text-[#80533f]'
+                    : 'fill-none text-line'
                 )}
               />
               {isPartial && (
@@ -71,7 +71,7 @@ export const StarRating: React.FC<StarRatingProps> = ({
                 >
                   <Star
                     size={size}
-                    className="fill-gray-900 text-gray-900"
+                    className="fill-[#80533f] text-[#80533f]"
                   />
                 </div>
               )}

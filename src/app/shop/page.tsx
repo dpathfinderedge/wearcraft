@@ -68,14 +68,15 @@ export default function ShopPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="min-h-screen bg-paper">
+      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
 
         <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-light text-gray-900 mb-2">
-            Shop All Products
+          <p className="mb-3 text-xs uppercase tracking-[0.2em] text-[#80533f]">The collection</p>
+          <h1 className="mb-2 text-3xl font-light tracking-tight text-ink md:text-4xl">
+            Find your everyday pieces
           </h1>
-          <p className="text-gray-600">
+          <p className="text-muted">
             {sortedProducts.length} {sortedProducts.length === 1 ? 'product' : 'products'}
           </p>
         </div>
@@ -93,7 +94,7 @@ export default function ShopPage() {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as SortOption)}
-              className="px-4 py-2 border border-gray-300 rounded-sm text-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900"
+              className="rounded-md border border-line bg-white px-4 py-3 text-sm text-ink outline-none focus:border-olive focus:ring-1 focus:ring-olive"
             >
               <option value="featured">Featured</option>
               <option value="newest">Newest</option>
