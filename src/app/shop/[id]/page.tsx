@@ -7,7 +7,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { Heart, Minus, Package, Plus, ShieldCheck, Truck } from 'lucide-react';
 import { products } from '@/data/products';
 import { Badge, StarRating } from '@/components/common';
-import { ColorSelector, SizeSelector } from '@/components/product';
+import { ColorSelector, ProductReviews, SizeSelector } from '@/components/product';
 import { Button, useToast } from '@/components/ui';
 import { useAuthStore, useCartStore, useWishlistStore } from '@/store';
 import { calculateDiscount, formatPrice } from '@/lib/utils';
@@ -203,6 +203,7 @@ export default function ProductDetailPage() {
                 <ShieldCheck size={19} className="mt-0.5 shrink-0 text-brown" strokeWidth={1.5} />
                 <div><h2 className="text-sm font-medium text-ink">Secure payment</h2><p className="mt-1 text-xs leading-5 text-muted">Protected checkout</p></div>
               </div>
+              <ProductReviews productId={product.id} productName={product.name} />
             </div>
 
             <div className="mt-8 grid gap-6 border-b border-line pb-2 sm:grid-cols-2 lg:grid-cols-1">
