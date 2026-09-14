@@ -2,7 +2,8 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Trash2 } from 'lucide-react';
+import Image from 'next/image';
+import { Minus, Plus, Trash2 } from 'lucide-react';
 import { CartItem as CartItemType } from '@/types/cart';
 import { formatPrice } from '@/lib/utils';
 import { useCartStore } from '@/store';
@@ -34,16 +35,18 @@ export const CartItem: React.FC<CartItemProps> = ({ item }) => {
   const itemTotal = item.product.price * item.quantity;
 
   return (
-    <div className="flex gap-4 py-6 border-b border-gray-200">
+    <div className="flex gap-4 border-b border-line py-6 last:border-b-0 sm:gap-6">
 
       <Link
         href={`/shop/${item.product.id}`}
-        className="flex-shrink-0 w-24 h-32 bg-gray-100 overflow-hidden"
+        className="relative h-32 w-24 flex-shrink-0 overflow-hidden rounded-md bg-[#ebe8e1] sm:h-36 sm:w-28"
       >
-        <img
+        <Image
           src={item.product.images[0]}
           alt={item.product.name}
-          className="w-full h-full object-cover hover:opacity-75 transition"
+          fill
+          sizes="112px"
+          className="object-cover transition-opacity hover:opacity-75"
         />
       </Link>
 
@@ -53,15 +56,15 @@ export const CartItem: React.FC<CartItemProps> = ({ item }) => {
           <div>
             <Link
               href={`/shop/${item.product.id}`}
-              className="text-base font-medium text-gray-900 hover:text-gray-700 transition"
+              className="text-sm font-medium text-ink transition-colors hover:text-brown sm:text-base"
             >
               {item.product.name}
             </Link>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="mt-1 text-xs uppercase tracking-[0.08em] text-muted">
               {item.selectedColor} / {item.selectedSize}
             </p>
           </div>
-          <p className="text-base font-medium text-gray-900">
+          <p className="text-sm font-medium text-ink sm:text-base">
             {formatPrice(itemTotal)}
           </p>
         </div>
@@ -71,24 +74,29 @@ export const CartItem: React.FC<CartItemProps> = ({ item }) => {
           <div className="flex items-center gap-2">
             <button
               onClick={() => handleQuantityChange(item.quantity - 1)}
-              className="w-8 h-8 border border-gray-300 rounded-sm hover:bg-gray-50 transition text-sm"
+                type="button"
+                aria-label={`Decrease quantity of ${item.product.name}`}
+                className="rounded-md p-2 text-muted transition-colors hover:bg-paper hover:text-ink"
             >
-              −
+              <Minus size={14} />
             </button>
-            <span className="text-sm font-medium w-8 text-center">
+            <span className="w-7 text-center text-sm font-medium text-ink">
               {item.quantity}
             </span>
             <button
               onClick={() => handleQuantityChange(item.quantity + 1)}
-              className="w-8 h-8 border border-gray-300 rounded-sm hover:bg-gray-50 transition text-sm"
+                type="button"
+                aria-label={`Increase quantity of ${item.product.name}`}
+                className="rounded-md p-2 text-muted transition-colors hover:bg-paper hover:text-ink"
             >
-              +
+              <Plus size={14} />
             </button>
           </div>
 
           <button
             onClick={handleRemove}
-            className="flex items-center gap-1.5 text-sm text-red-600 hover:text-red-700 transition"
+            type="button"
+            className="flex items-center gap-1.5 text-xs uppercase tracking-[0.08em] text-clay transition-colors hover:text-brown"
           >
             <Trash2 size={16} />
             Remove

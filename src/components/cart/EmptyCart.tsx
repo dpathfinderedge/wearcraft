@@ -5,17 +5,17 @@ import { Button } from '@/components/ui';
 
 export const EmptyCart: React.FC = () => {
   return (
-    <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-      <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-6">
-        <ShoppingBag size={40} className="text-gray-400" strokeWidth={1.5} />
+    <div className="flex flex-col items-center justify-center rounded-md border border-dashed border-line bg-white px-4 py-20 text-center">
+      <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-[#eee8df]">
+        <ShoppingBag size={34} className="text-brown" strokeWidth={1.5} />
       </div>
 
-      <h2 className="text-2xl font-medium text-gray-900 mb-2">
-        Your cart is empty
+      <h2 className="mb-2 text-3xl font-light tracking-[-0.03em] text-ink">
+        Your bag is waiting
       </h2>
 
-      <p className="text-gray-600 mb-8 max-w-md">
-        Looks like you haven&apos;t added anything to your cart yet. Start shopping to fill it up!
+      <p className="mb-8 max-w-md text-sm leading-6 text-muted">
+        Nothing has been added yet. Explore considered essentials and keep the pieces that feel right.
       </p>
 
       <Link href="/shop">

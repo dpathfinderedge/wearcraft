@@ -11,19 +11,20 @@ export default function CartPage() {
   const summary = getCartSummary();
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="min-h-screen bg-paper">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
 
-        <div className="mb-8">
+        <div className="mb-10">
           <Link
             href="/shop"
-            className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 mb-4"
+            className="mb-5 inline-flex items-center text-xs uppercase tracking-[0.14em] text-muted transition-colors hover:text-ink"
           >
             <ArrowLeft size={16} className="mr-1" />
             Continue Shopping
           </Link>
-          <h1 className="text-3xl md:text-4xl font-light text-gray-900">
-            Shopping Cart
+          <p className="mb-3 text-xs uppercase tracking-[0.2em] text-brown">Your selection</p>
+          <h1 className="text-4xl font-light tracking-[-0.04em] text-ink md:text-5xl">
+            Shopping bag
           </h1>
         </div>
 
@@ -31,12 +32,12 @@ export default function CartPage() {
         {items.length === 0 ? (
           <EmptyCart />
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 lg:gap-12">
 
             <div className="lg:col-span-2">
-              <div className="bg-white border border-gray-200 rounded-sm">
-                <div className="px-6 py-4 border-b border-gray-200">
-                  <h2 className="text-lg font-semibold text-gray-900">
+              <div className="rounded-md border border-line bg-white px-5 sm:px-7">
+                <div className="border-b border-line py-5">
+                  <h2 className="text-xs font-medium uppercase tracking-[0.16em] text-ink">
                     Cart Items ({summary.itemCount})
                   </h2>
                 </div>
