@@ -22,12 +22,13 @@ export const ColorSelector: React.FC<ColorSelectorProps> = ({
         {colors.map((color) => (
           <button
             key={color}
+            type="button"
             onClick={() => onColorSelect(color)}
             className={cn(
-              'px-4 py-2 text-sm border rounded-sm transition',
+              'rounded-md border px-4 py-2 text-sm transition',
               selectedColor === color
-                ? 'border-gray-900 bg-gray-50'
-                : 'border-gray-300 hover:border-gray-900'
+                ? 'border-brown bg-[#f1ebe5] text-ink'
+                : 'border-line text-muted hover:border-brown hover:text-ink'
             )}
           >
             <span className="flex items-center gap-2">
