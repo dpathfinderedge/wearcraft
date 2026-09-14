@@ -53,7 +53,7 @@ export const CategoryGrid: React.FC = () => {
             <Link
               key={category.name}
               href={category.href}
-              className="group relative aspect-[3/4] overflow-hidden bg-gray-100"
+              className="group relative aspect-[3/4] overflow-hidden rounded-sm bg-gray-100"
             >
 
               <img

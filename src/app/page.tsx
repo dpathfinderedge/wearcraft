@@ -1,4 +1,4 @@
-import { CategoryGrid, FeaturedProducts, Features, HeroSection, Newsletter } from '@/components/home'
+import { CategoryGrid, FAQ, FeaturedProducts, Features, HeroSection, Newsletter } from '@/components/home'
 import { products } from '@/data/products'
 
 export default function Home() {
@@ -10,6 +10,7 @@ export default function Home() {
       <FeaturedProducts products={featuredProducts} />
       <CategoryGrid />
       <Features />
+      <FAQ />
       <Newsletter />
 
     </>

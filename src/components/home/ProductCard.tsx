@@ -33,7 +33,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   return (
     <div className="group relative">
       <Link href={`/shop/${product.id}`}>
-        <div className="relative aspect-[3/4] bg-gray-100 overflow-hidden mb-3">
+        <div className="relative mb-3 aspect-[3/4] overflow-hidden rounded-sm bg-gray-100">
           {!imageError ? (
             <img
               src={product.images[0]}
