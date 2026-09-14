@@ -52,11 +52,12 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
   });
 
   return (
-    <form ref={formRef} onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <form ref={formRef} onSubmit={handleSubmit(onSubmit)} className="space-y-9">
 
       <div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
-          Contact Information
+        <p className="mb-2 text-xs uppercase tracking-[0.16em] text-brown">Step one</p>
+        <h3 className="mb-5 text-2xl font-light tracking-[-0.03em] text-ink">
+          Contact information
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Input
@@ -76,8 +77,9 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
 
 
       <div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
-          Shipping Address
+        <p className="mb-2 text-xs uppercase tracking-[0.16em] text-brown">Step two</p>
+        <h3 className="mb-5 text-2xl font-light tracking-[-0.03em] text-ink">
+          Shipping address
         </h3>
         <div className="space-y-4">
           <Input
@@ -130,7 +132,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
 
       <Button
         type="submit"
-        variant="outline"
+        variant="primary"
         size="lg"
         className="w-full"
         disabled={isLoading}

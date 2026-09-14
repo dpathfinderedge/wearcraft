@@ -24,15 +24,14 @@ export const CartSummary: React.FC<CartSummaryProps> = ({
   const hasFreeShipping = shipping === 0 && subtotal > 0;
 
   return (
-    <div className="bg-gray-50 rounded-sm p-6">
-      <h2 className="text-lg font-semibold text-gray-900 mb-6">Order Summary</h2>
-
-
+    <div className="rounded-md border border-line bg-white p-6 sm:p-7">
+      <p className="mb-2 text-xs uppercase tracking-[0.16em] text-brown">At a glance</p>
+      <h2 className="mb-6 text-2xl font-light tracking-[-0.03em] text-ink">Order summary</h2>
       {subtotal > 0 && subtotal < freeShippingThreshold && (
-        <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-sm">
+        <div className="mb-6 rounded-md border border-[#d8cbbd] bg-[#f5efe9] p-4">
           <div className="flex items-start gap-2">
-            <Truck size={18} className="text-blue-600 mt-0.5 flex-shrink-0" />
-            <p className="text-sm text-blue-800">
+            <Truck size={18} className="mt-0.5 flex-shrink-0 text-brown" />
+            <p className="text-sm text-ink">
               Add <span className="font-semibold">{formatPrice(amountToFreeShipping)}</span> more
               to get <span className="font-semibold">free shipping!</span>
             </p>
@@ -41,41 +40,41 @@ export const CartSummary: React.FC<CartSummaryProps> = ({
       )}
 
       {hasFreeShipping && (
-        <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-sm">
+        <div className="mb-6 rounded-md border border-[#cbd7c8] bg-[#edf3eb] p-4">
           <div className="flex items-start gap-2">
-            <Truck size={18} className="text-green-600 mt-0.5 flex-shrink-0" />
-            <p className="text-sm text-green-800 font-medium">
-              You&apos;ve got free shipping! 🎉
+            <Truck size={18} className="mt-0.5 flex-shrink-0 text-olive" />
+            <p className="text-sm font-medium text-olive-dark">
+              You&apos;ve got free shipping.
             </p>
           </div>
         </div>
       )}
 
 
-      <div className="space-y-3 mb-6">
+      <div className="mb-6 space-y-3">
         <div className="flex justify-between text-sm">
-          <span className="text-gray-600">
+          <span className="text-muted">
             Subtotal ({itemCount} {itemCount === 1 ? 'item' : 'items'})
           </span>
-          <span className="text-gray-900 font-medium">{formatPrice(subtotal)}</span>
+          <span className="font-medium text-ink">{formatPrice(subtotal)}</span>
         </div>
         <div className="flex justify-between text-sm">
-          <span className="text-gray-600">Shipping</span>
-          <span className="text-gray-900 font-medium">
+          <span className="text-muted">Shipping</span>
+          <span className="font-medium text-ink">
             {shipping === 0 ? 'Free' : formatPrice(shipping)}
           </span>
         </div>
         <div className="flex justify-between text-sm">
-          <span className="text-gray-600">Tax (8.5%)</span>
-          <span className="text-gray-900 font-medium">{formatPrice(tax)}</span>
+          <span className="text-muted">Tax (8.5%)</span>
+          <span className="font-medium text-ink">{formatPrice(tax)}</span>
         </div>
       </div>
 
 
-      <div className="border-t border-gray-200 pt-4 mb-6">
+      <div className="mb-6 border-t border-line pt-4">
         <div className="flex justify-between">
-          <span className="text-base font-semibold text-gray-900">Total</span>
-          <span className="text-xl font-bold text-gray-900">{formatPrice(total)}</span>
+          <span className="text-base font-medium text-ink">Total</span>
+          <span className="text-xl font-medium text-ink">{formatPrice(total)}</span>
         </div>
       </div>
 

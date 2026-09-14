@@ -176,21 +176,22 @@ export default function CheckoutPage() {
     <>
       {isProcessing && <LoadingOverlay message="Processing your order..." />}
 
-      <div className="min-h-screen bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="mb-8">
-            <h1 className="text-3xl md:text-4xl font-light text-gray-900 mb-2">Checkout</h1>
-            <p className="text-gray-600">Complete your purchase securely.</p>
+      <div className="min-h-screen bg-paper">
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
+          <div className="mb-10">
+            <p className="mb-3 text-xs uppercase tracking-[0.2em] text-brown">Almost yours</p>
+            <h1 className="mb-2 text-4xl font-light tracking-[-0.04em] text-ink md:text-5xl">Checkout</h1>
+            <p className="text-muted">Complete your purchase securely.</p>
           </div>
 
           {!hasValidPaystackKey && (
-            <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-sm text-sm text-yellow-800">
+            <div className="mb-6 rounded-md border border-[#d8cbbd] bg-[#f5efe9] p-4 text-sm text-ink">
               <strong>Demo Mode:</strong> PayStack is not configured. You can still place a test order.
             </div>
           )}
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2 bg-white border border-gray-200 rounded-sm p-6">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 lg:gap-12">
+            <div className="rounded-md border border-line bg-white p-6 sm:p-8 lg:col-span-2">
               <CheckoutForm
                 onSubmit={handleFormSubmit}
                 defaultValues={{
@@ -209,17 +210,18 @@ export default function CheckoutPage() {
                 onPaystackError={handlePaystackError}
               />
 
-              <div className="mt-8 pt-8 border-t border-gray-200">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Payment Method</h3>
-                <div className="border border-gray-300 rounded-sm p-4 flex items-center gap-3">
-                  <div className="w-12 h-12 bg-gray-100 rounded flex items-center justify-center">
-                    <ShieldCheck size={24} className="text-gray-600" />
+              <div className="mt-10 border-t border-line pt-8">
+                <p className="mb-2 text-xs uppercase tracking-[0.16em] text-brown">Step three</p>
+                <h3 className="mb-4 text-2xl font-light tracking-[-0.03em] text-ink">Payment method</h3>
+                <div className="flex items-center gap-3 rounded-md border border-line bg-paper p-4">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-md bg-[#eee8df]">
+                    <ShieldCheck size={24} className="text-brown" />
                   </div>
                   <div>
-                    <p className="font-medium text-gray-900">
+                    <p className="font-medium text-ink">
                       {hasValidPaystackKey ? 'PayStack Checkout' : 'Test Checkout'}
                     </p>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm leading-6 text-muted">
                       {hasValidPaystackKey
                         ? 'Secure payment via PayStack. Your card information stays encrypted.'
                         : 'Demo sales mode: payment is simulated for testing without a PayStack key.'}
@@ -240,9 +242,9 @@ export default function CheckoutPage() {
                 />
 
                 {shippingSaved && (
-                  <div className="p-3 bg-green-50 border border-green-200 rounded-sm">
+                  <div className="rounded-md border border-[#cbd7c8] bg-[#edf3eb] p-3">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-green-800">Shipping address saved</span>
+                      <span className="text-sm font-medium text-olive-dark">Shipping address saved</span>
                     </div>
                   </div>
                 )}
@@ -258,7 +260,7 @@ export default function CheckoutPage() {
                   {isProcessing ? 'Processing...' : hasValidPaystackKey ? `Pay ${summary.total.toFixed(2)}` : 'Place Order'}
                 </Button>
 
-                <p className="text-xs text-center text-gray-500">
+                <p className="text-center text-xs leading-5 text-muted">
                   By completing your purchase, you agree to our Terms of Service and Privacy Policy.
                 </p>
               </div>

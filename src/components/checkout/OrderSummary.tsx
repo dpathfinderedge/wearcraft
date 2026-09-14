@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 import { CartItem } from '@/types/cart';
 import { formatPrice } from '@/lib/utils';
 
@@ -18,33 +19,34 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({
   total,
 }) => {
   return (
-    <div className="bg-gray-50 rounded-sm p-6">
-      <h3 className="text-lg font-semibold text-gray-900 mb-6">Order Summary</h3>
-
-
-      <div className="space-y-4 mb-6">
+    <div className="rounded-md border border-line bg-white p-6 sm:p-7">
+      <p className="mb-2 text-xs uppercase tracking-[0.16em] text-brown">Your order</p>
+      <h3 className="mb-6 text-2xl font-light tracking-[-0.03em] text-ink">Order summary</h3>
+      <div className="mb-6 space-y-4">
         {items.map((item) => (
           <div
             key={`${item.product.id}-${item.selectedSize}-${item.selectedColor}`}
-            className="flex gap-4"
+            className="flex gap-3"
           >
-            <div className="w-16 h-20 bg-gray-200 flex-shrink-0 overflow-hidden">
-              <img
+            <div className="relative h-20 w-16 flex-shrink-0 overflow-hidden rounded-md bg-[#ebe8e1]">
+              <Image
                 src={item.product.images[0]}
                 alt={item.product.name}
-                className="w-full h-full object-cover"
+                fill
+                sizes="64px"
+                className="object-cover"
               />
             </div>
             <div className="flex-1 min-w-0">
-              <h4 className="text-sm font-medium text-gray-900 truncate">
+              <h4 className="truncate text-sm font-medium text-ink">
                 {item.product.name}
               </h4>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="mt-1 text-xs uppercase tracking-[0.06em] text-muted">
                 {item.selectedColor} / {item.selectedSize}
               </p>
-              <p className="text-xs text-gray-500 mt-1">Qty: {item.quantity}</p>
+              <p className="mt-1 text-xs text-muted">Qty: {item.quantity}</p>
             </div>
-            <div className="text-sm font-medium text-gray-900">
+            <div className="text-sm font-medium text-ink">
               {formatPrice(item.product.price * item.quantity)}
             </div>
           </div>
@@ -52,24 +54,24 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({
       </div>
 
 
-      <div className="border-t border-gray-200 pt-4 space-y-2">
+      <div className="space-y-2 border-t border-line pt-4">
         <div className="flex justify-between text-sm">
-          <span className="text-gray-600">Subtotal</span>
-          <span className="text-gray-900 font-medium">{formatPrice(subtotal)}</span>
+          <span className="text-muted">Subtotal</span>
+          <span className="font-medium text-ink">{formatPrice(subtotal)}</span>
         </div>
         <div className="flex justify-between text-sm">
-          <span className="text-gray-600">Shipping</span>
-          <span className="text-gray-900 font-medium">
+          <span className="text-muted">Shipping</span>
+          <span className="font-medium text-ink">
             {shipping === 0 ? 'Free' : formatPrice(shipping)}
           </span>
         </div>
         <div className="flex justify-between text-sm">
-          <span className="text-gray-600">Tax</span>
-          <span className="text-gray-900 font-medium">{formatPrice(tax)}</span>
+          <span className="text-muted">Tax</span>
+          <span className="font-medium text-ink">{formatPrice(tax)}</span>
         </div>
-        <div className="border-t border-gray-200 pt-2 flex justify-between">
-          <span className="text-base font-semibold text-gray-900">Total</span>
-          <span className="text-xl font-bold text-gray-900">{formatPrice(total)}</span>
+        <div className="flex justify-between border-t border-line pt-2">
+          <span className="text-base font-medium text-ink">Total</span>
+          <span className="text-xl font-medium text-ink">{formatPrice(total)}</span>
         </div>
       </div>
     </div>
