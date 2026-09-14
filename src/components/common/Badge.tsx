@@ -15,11 +15,11 @@ export const Badge: React.FC<BadgeProps> = ({
   className,
 }) => {
   const variants = {
-    default: 'bg-gray-100 text-gray-800',
-    success: 'bg-green-100 text-green-800',
-    error: 'bg-red-100 text-red-800',
-    warning: 'bg-yellow-100 text-yellow-800',
-    info: 'bg-blue-100 text-blue-800',
+    default: 'bg-[#eeede7] text-ink',
+    success: 'bg-[#eef3ec] text-olive-dark',
+    error: 'bg-[#fbefeb] text-[#8f543e]',
+    warning: 'bg-[#fbf5e5] text-amber-800',
+    info: 'bg-[#edf4f7] text-sky-800',
   };
 
   const sizes = {
@@ -30,7 +30,7 @@ export const Badge: React.FC<BadgeProps> = ({
   return (
     <span
       className={cn(
-        'inline-flex items-center font-medium rounded-sm',
+        'inline-flex items-center rounded-md font-medium',
         variants[variant],
         sizes[size],
         className

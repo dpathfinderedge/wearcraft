@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Heart } from 'lucide-react';
 import { Product } from '@/types/product';
 import { StarRating, Badge } from '@/components/common';
@@ -33,12 +34,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   return (
     <div className="group relative">
       <Link href={`/shop/${product.id}`}>
-        <div className="relative mb-3 aspect-[3/4] overflow-hidden rounded-sm bg-gray-100">
+        <div className="relative mb-3 aspect-[3/4] overflow-hidden rounded-md bg-gray-100">
           {!imageError ? (
-            <img
+            <Image
               src={product.images[0]}
               alt={product.name}
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              fill
+              sizes="(max-width: 768px) 50vw, 25vw"
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
               onError={() => setImageError(true)}
             />
           ) : (
@@ -66,7 +69,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           }
           void toggleWishlist(product);
         }}
-        className="absolute top-2 right-2 z-10 p-2 bg-white rounded-full shadow-sm hover:shadow-md transition-all"
+        className="absolute right-2 top-2 z-10 rounded-full bg-white p-2 shadow-sm transition-all hover:shadow-md"
       >
         <Heart
           size={18}

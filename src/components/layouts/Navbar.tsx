@@ -29,6 +29,7 @@ export const Navbar: React.FC = () => {
     { name: 'Men', href: '/shop?category=mens' },
     { name: 'Women', href: '/shop?category=womens' },
     { name: 'Accessories', href: '/shop?category=accessories' },
+    { name: 'Contact', href: '/contact' },
   ];
 
   return (

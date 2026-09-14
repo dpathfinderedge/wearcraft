@@ -11,10 +11,10 @@ interface ProductGridProps {
 export const ProductGrid: React.FC<ProductGridProps> = ({ products, isLoading }) => {
   if (isLoading) {
     return (
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-4">
         {[...Array(8)].map((_, i) => (
           <div key={i} className="animate-pulse">
-            <div className="aspect-[3/4] bg-gray-200 mb-3" />
+            <div className="mb-3 aspect-[3/4] rounded-md bg-gray-200" />
             <div className="h-4 bg-gray-200 mb-2" />
             <div className="h-4 bg-gray-200 w-2/3" />
           </div>
@@ -36,7 +36,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ products, isLoading })
   }
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-4">
       {products.map((product) => (
         <ProductCard key={product.id} product={product} />
       ))}
