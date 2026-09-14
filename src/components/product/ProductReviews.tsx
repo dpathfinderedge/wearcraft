@@ -81,9 +81,9 @@ export function ProductReviews({ productId, productName }: ProductReviewsProps) 
   };
 
   return (
-    <section className="mt-20 border-t border-line pt-12" aria-labelledby="reviews-heading">
-      <div className="grid gap-10 lg:grid-cols-[0.7fr_1.3fr]">
-        <div>
+    <section className="mt-20 w-full border-t border-line pt-12" aria-labelledby="reviews-heading">
+      <div className="grid min-w-0 w-full gap-10 lg:grid-cols-[minmax(0,0.7fr)_minmax(0,1.3fr)]">
+        <div className="min-w-0">
           <p className="mb-3 text-xs uppercase tracking-[0.2em] text-brown">The community</p>
           <h2 id="reviews-heading" className="text-3xl font-light tracking-[-0.04em] text-ink">Reviews</h2>
           <div className="mt-5 flex items-center gap-3">
@@ -91,9 +91,9 @@ export function ProductReviews({ productId, productName }: ProductReviewsProps) 
             <div><StarRating rating={summary.averageRating} size={18} /><p className="mt-1 text-xs text-muted">{summary.reviewCount} {summary.reviewCount === 1 ? 'review' : 'reviews'}</p></div>
           </div>
           {hasCheckedAuth && isAuthenticated ? (
-            <form onSubmit={handleSubmit} className="mt-8 space-y-4 rounded-md border border-line bg-white p-5">
+            <form onSubmit={handleSubmit} className="mt-8 w-full space-y-4 rounded-md border border-line bg-white p-5 sm:p-6">
               <h3 className="text-lg font-medium text-ink">Share your experience</h3>
-              <div>
+              <div className="min-w-0">
                 <p className="mb-2 text-xs font-medium uppercase tracking-[0.1em] text-muted">Your rating</p>
                 <StarRating rating={rating} interactive onRatingChange={setRating} size={23} />
               </div>
