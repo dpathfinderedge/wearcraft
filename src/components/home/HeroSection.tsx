@@ -1,41 +1,43 @@
-import React from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui';
 
-export const HeroSection: React.FC = () => {
+export function HeroSection() {
   return (
-    <section className="relative bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28 lg:py-32">
-        <div className="max-w-3xl">
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-light tracking-tight text-gray-900 mb-6">
-            Timeless style.
+    <section className="bg-[#e9e4da]">
+      <div className="mx-auto grid max-w-7xl items-stretch lg:grid-cols-[0.9fr_1.1fr]">
+        <div className="flex flex-col justify-center px-4 py-16 sm:px-6 md:py-24 lg:px-8 lg:py-28">
+          <p className="mb-5 text-xs uppercase tracking-[0.22em] text-brown">The autumn edit</p>
+          <h1 className="max-w-xl text-5xl font-light tracking-[-0.04em] text-ink md:text-6xl lg:text-7xl">
+            Quiet pieces.
             <br />
-            <span className="font-normal">Made simple.</span>
+            <span className="text-brown">Strong presence.</span>
           </h1>
-          <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-2xl font-light">
-            Carefully curated wardrobe essentials designed for the way you live.
-            Quality craftsmanship meets modern sensibility.
+          <p className="mb-8 mt-6 max-w-lg text-base leading-7 text-muted md:text-lg">
+            Carefully considered wardrobe essentials for the everyday. Natural textures, generous silhouettes, and a palette made to live together.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-col gap-3 sm:flex-row">
             <Link href="/shop">
-              <Button variant="primary" size="lg" className="w-full sm:w-auto">
-                Explore Collection
-              </Button>
+              <Button variant="primary" size="lg" className="w-full sm:w-auto">Explore the edit</Button>
             </Link>
             <Link href="/shop?category=womens">
-              <Button variant="outline" size="lg" className="w-full sm:w-auto">
-                Shop Women&apos;s
-              </Button>
+              <Button variant="outline" size="lg" className="w-full sm:w-auto">Shop women&apos;s</Button>
             </Link>
           </div>
         </div>
-      </div>
-
-
-      <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 right-0 w-96 h-96 bg-gray-100 rounded-full blur-3xl opacity-50" />
-        <div className="absolute bottom-1/4 left-0 w-96 h-96 bg-gray-100 rounded-full blur-3xl opacity-50" />
+        <div className="relative min-h-[28rem] overflow-hidden lg:min-h-[38rem]">
+          <Image
+            src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1200&h=1400&fit=crop"
+            alt="Woman wearing a considered neutral outfit"
+            fill
+            priority
+            className="object-cover object-center"
+            sizes="(max-width: 1024px) 100vw, 55vw"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+          <p className="absolute bottom-6 left-6 text-xs uppercase tracking-[0.2em] text-white">WearCraft / 01</p>
+        </div>
       </div>
     </section>
   );
-};
+}

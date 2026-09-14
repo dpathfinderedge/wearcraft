@@ -37,18 +37,19 @@ const categories: Category[] = [
 
 export const CategoryGrid: React.FC = () => {
   return (
-    <section className="py-16 md:py-20 bg-gray-50">
+    <section className="bg-[#eeede7] py-16 md:py-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-light text-gray-900 mb-2">
-            Shop by Category
-          </h2>
-          <p className="text-gray-600">Explore our curated collections</p>
+        <div className="mb-10 flex flex-col justify-between gap-3 md:mb-12 md:flex-row md:items-end">
+          <div>
+            <p className="mb-3 text-xs uppercase tracking-[0.2em] text-brown">Find your uniform</p>
+            <h2 className="text-3xl font-light tracking-tight text-ink md:text-4xl">Shop by category</h2>
+          </div>
+          <p className="max-w-xs text-sm leading-6 text-muted">Four considered starting points for building a wardrobe that feels like you.</p>
         </div>
 
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
           {categories.map((category) => (
             <Link
               key={category.name}
@@ -66,7 +67,7 @@ export const CategoryGrid: React.FC = () => {
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
 
 
-              <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+              <div className="absolute inset-x-0 bottom-0 p-6 text-white">
                 <p className="text-xs uppercase tracking-wider mb-1 opacity-90">
                   {category.description}
                 </p>
