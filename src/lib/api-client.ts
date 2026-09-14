@@ -1,6 +1,7 @@
 import { Address, ApiAddress, ApiUser, UpdateProfileData } from '@/types/user';
 import { ApiOrder } from '@/types/order';
 import { mapAddressToApi } from '@/lib/mappers';
+import { ProductReview, ReviewSummary } from '@/types/review';
 
 export interface ApiResponse<T = unknown> {
   success: boolean;
@@ -213,18 +214,23 @@ class ApiClient {
   }
 
   async createReview(productId: string, data: {
+    productName?: string;
     rating: number;
-    title?: string;
+    title: string;
     comment: string;
-  }) {
-    return this.request(`/api/products/${productId}/reviews`, {
+  }): Promise<ApiResponse<ProductReview>> {
+    return this.request<ProductReview>(`/api/products/${productId}/reviews`, {
       method: 'POST',
       body: JSON.stringify(data),
     });
   }
 
-  async getReviews(productId: string) {
-    return this.request(`/api/products/${productId}/reviews`);
+  async getReviews(productId: string, productName?: string): Promise<ApiResponse<{
+    reviews: ProductReview[];
+    summary: ReviewSummary;
+  }>> {
+    const query = productName ? `?name=${encodeURIComponent(productName)}` : '';
+    return this.request(`/api/products/${productId}/reviews${query}`);
   }
 
   async getWishlist(): Promise<ApiResponse<unknown[]>> {

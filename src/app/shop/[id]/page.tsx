@@ -7,7 +7,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { Heart, Minus, Package, Plus, ShieldCheck, Truck } from 'lucide-react';
 import { products } from '@/data/products';
 import { Badge, StarRating } from '@/components/common';
-import { ColorSelector, SizeSelector } from '@/components/product';
+import { ColorSelector, ProductReviews, SizeSelector } from '@/components/product';
 import { Button, useToast } from '@/components/ui';
 import { useAuthStore, useCartStore, useWishlistStore } from '@/store';
 import { calculateDiscount, formatPrice } from '@/lib/utils';
@@ -221,6 +221,7 @@ export default function ProductDetailPage() {
             </div>
           </section>
         </div>
+        <ProductReviews productId={product.id} productName={product.name} />
       </div>
     </div>
   );
