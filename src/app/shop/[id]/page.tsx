@@ -5,12 +5,13 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { Heart, Minus, Package, Plus, ShieldCheck, Truck } from 'lucide-react';
-import { products } from '@/data/products';
 import { Badge, StarRating } from '@/components/common';
 import { ColorSelector, ProductReviews, SizeSelector } from '@/components/product';
 import { Button, useToast } from '@/components/ui';
 import { useAuthStore, useCartStore, useWishlistStore } from '@/store';
 import { calculateDiscount, formatPrice } from '@/lib/utils';
+import { apiClient } from '@/lib/api-client';
+import type { Product } from '@/types/product';
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -20,11 +21,37 @@ export default function ProductDetailPage() {
   const { isAuthenticated, hasCheckedAuth } = useAuthStore();
   const { hasLoaded, loadWishlist, isWishlisted, toggleWishlist } = useWishlistStore();
   const productKey = decodeURIComponent(String(params.id));
-  const product = products.find((item) => item.id === productKey || item.name === productKey);
-  const [selectedSize, setSelectedSize] = useState(product?.sizes[0] || '');
-  const [selectedColor, setSelectedColor] = useState(product?.colors[0] || '');
+  const [product, setProduct] = useState<Product | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
+  const [selectedSize, setSelectedSize] = useState('');
+  const [selectedColor, setSelectedColor] = useState('');
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
+
+  useEffect(() => {
+    let cancelled = false;
+    void apiClient.getProduct(productKey).then((response) => {
+      if (cancelled) return;
+      if (response.success && response.data) {
+        const data = response.data as Product & { comparePrice?: number | null; material?: string | null; care?: string | null };
+        setProduct({
+          ...data,
+          originalPrice: data.comparePrice ?? undefined,
+          material: data.material ?? undefined,
+          care: data.care ?? undefined,
+        });
+        setSelectedSize(data.sizes[0] || '');
+        setSelectedColor(data.colors[0] || '');
+        setSelectedImage(0);
+        setLoadError(false);
+      } else {
+        setLoadError(true);
+      }
+      setIsLoading(false);
+    });
+    return () => { cancelled = true; };
+  }, [productKey]);
 
   useEffect(() => {
     if (hasCheckedAuth && isAuthenticated && !hasLoaded) {
@@ -32,7 +59,11 @@ export default function ProductDetailPage() {
     }
   }, [hasCheckedAuth, hasLoaded, isAuthenticated, loadWishlist]);
 
-  if (!product) {
+  if (isLoading) {
+    return <div className="flex min-h-[70vh] items-center justify-center bg-paper text-sm text-muted">Loading piece...</div>;
+  }
+
+  if (loadError || !product) {
     return (
       <div className="flex min-h-[70vh] items-center justify-center bg-paper px-4">
         <div className="max-w-md text-center">
