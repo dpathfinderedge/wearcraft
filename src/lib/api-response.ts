@@ -56,6 +56,9 @@ export function handleApiError(error: unknown): NextResponse<ApiResponse> {
     if (error.message === 'Unauthorized') {
       return errorResponse('Unauthorized. Please login.', 401);
     }
+    if (error.message === 'Forbidden') {
+      return errorResponse('You do not have permission to perform this action.', 403);
+    }
 
     if (error.message.includes('not found')) {
       return errorResponse('Resource not found', 404);

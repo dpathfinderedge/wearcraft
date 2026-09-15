@@ -10,6 +10,18 @@ export interface ApiResponse<T = unknown> {
   message?: string;
 }
 
+export interface AdminReview {
+  id: string;
+  rating: number;
+  title: string | null;
+  comment: string;
+  verified: boolean;
+  published: boolean;
+  createdAt: string;
+  user: { firstName: string; lastName: string; email: string };
+  product: { name: string };
+}
+
 class ApiClient {
   private baseUrl: string;
 
@@ -231,6 +243,23 @@ class ApiClient {
   }>> {
     const query = productName ? `?name=${encodeURIComponent(productName)}` : '';
     return this.request(`/api/products/${productId}/reviews${query}`);
+  }
+
+  async getAdminReviews(): Promise<ApiResponse<AdminReview[]>> {
+    return this.request<AdminReview[]>('/api/admin/reviews');
+  }
+
+  async moderateReview(id: string, published: boolean): Promise<ApiResponse<AdminReview>> {
+    return this.request<AdminReview>(`/api/admin/reviews/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ published }),
+    });
+  }
+
+  async deleteReview(id: string): Promise<ApiResponse<{ id: string }>> {
+    return this.request<{ id: string }>(`/api/admin/reviews/${id}`, {
+      method: 'DELETE',
+    });
   }
 
   async getWishlist(): Promise<ApiResponse<unknown[]>> {
