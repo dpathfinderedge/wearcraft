@@ -40,7 +40,10 @@ export async function POST(request: NextRequest) {
   try {
     await requireAdmin(request);
     const input = productSchema.parse(await parseBody<unknown>(request));
-    const product = await prisma.product.create({ data: input });
+    const product = await prisma.product.create({
+      data: input,
+      include: { _count: { select: { reviews: true, wishlist: true } } },
+    });
     return successResponse(product, 'Product created.', 201);
   } catch (error) {
     if (error instanceof z.ZodError) {
