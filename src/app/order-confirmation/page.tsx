@@ -119,8 +119,8 @@ function OrderConfirmationContent() {
               </div>
             </div>
             <div className="flex items-start gap-4">
-              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <Package size={20} className="text-blue-600" />
+              <div className="w-10 h-10 bg-[#f5efe9] rounded-full flex items-center justify-center flex-shrink-0">
+                <Package size={20} className="text-brown" />
               </div>
               <div>
                 <h3 className="font-medium text-gray-900 mb-1">Order Processing</h3>
@@ -128,8 +128,8 @@ function OrderConfirmationContent() {
               </div>
             </div>
             <div className="flex items-start gap-4">
-              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <Truck size={20} className="text-blue-600" />
+              <div className="w-10 h-10 bg-[#f5efe9] rounded-full flex items-center justify-center flex-shrink-0">
+                <Truck size={20} className="text-brown" />
               </div>
               <div>
                 <h3 className="font-medium text-gray-900 mb-1">Shipping & Delivery</h3>
