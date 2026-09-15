@@ -92,13 +92,14 @@ export default function OrdersPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="min-h-screen bg-paper">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
         <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-light text-gray-900 mb-2">
-            Order History
+          <p className="mb-3 text-xs uppercase tracking-[0.2em] text-brown">Your journey</p>
+          <h1 className="mb-2 text-4xl font-light tracking-[-0.04em] text-ink md:text-5xl">
+            Order history
           </h1>
-          <p className="text-gray-600">
+          <p className="text-muted">
             View and track your orders
           </p>
         </div>
@@ -141,16 +142,16 @@ export default function OrdersPage() {
             {orders.map((order) => (
               <div
                 key={order.id}
-                className="bg-white border border-gray-200 rounded-sm overflow-hidden hover:shadow-sm transition"
+                className="overflow-hidden rounded-md border border-line bg-white transition-shadow hover:shadow-sm"
               >
-                <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
+                <div className="border-b border-line bg-paper px-5 py-5 sm:px-6">
                   <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 flex-1">
                       <div>
-                        <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">
+                        <p className="mb-1 text-xs uppercase tracking-[0.12em] text-muted">
                           Order Number
                         </p>
-                        <p className="text-sm font-semibold text-gray-900">
+                        <p className="text-sm font-semibold text-ink">
                           {order.orderNumber}
                         </p>
                       </div>
@@ -158,7 +159,7 @@ export default function OrdersPage() {
                         <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">
                           Date
                         </p>
-                        <p className="text-sm font-medium text-gray-900">
+                        <p className="text-sm font-medium text-ink">
                           {formatDate(order.createdAt, 'short')}
                         </p>
                       </div>
@@ -187,7 +188,7 @@ export default function OrdersPage() {
                     {order.items.slice(0, 4).map((item: OrderSummaryItem, index: number) => (
                       <div
                         key={index}
-                        className="relative shrink-0 w-16 h-20 bg-gray-100 overflow-hidden"
+                        className="relative h-20 w-16 shrink-0 overflow-hidden rounded-md bg-[#ebe8e1]"
                       >
                         <Image
                           src={item.image}
@@ -199,27 +200,27 @@ export default function OrdersPage() {
                       </div>
                     ))}
                     {order.items.length > 4 && (
-                      <div className="shrink-0 w-16 h-20 bg-gray-100 flex items-center justify-center">
+                      <div className="flex h-20 w-16 shrink-0 items-center justify-center rounded-md bg-[#eee8df]">
                         <span className="text-sm text-gray-600 font-medium">
                           +{order.items.length - 4}
                         </span>
                       </div>
                     )}
                   </div>
-                  <p className="text-sm text-gray-600 mt-4">
+                  <p className="mt-4 text-sm text-muted">
                     {order.items.length} {order.items.length === 1 ? 'item' : 'items'}
                   </p>
                 </div>
 
-                <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-between items-center">
-                  <div className="text-sm text-gray-600">
+                <div className="flex items-center justify-between border-t border-line bg-paper px-5 py-4 sm:px-6">
+                  <div className="text-sm text-muted">
                     {order.trackingNumber && (
-                      <p>Tracking: <span className="font-medium text-gray-900">{order.trackingNumber}</span></p>
+                      <p>Tracking: <span className="font-medium text-ink">{order.trackingNumber}</span></p>
                     )}
                   </div>
                   <Link
                     href={`/order-confirmation?orderId=${order.id}`}
-                    className="flex items-center gap-1 text-sm font-medium text-gray-900 hover:text-gray-700 transition"
+                    className="flex items-center gap-1 text-sm font-medium text-brown transition-colors hover:text-brown-dark"
                   >
                     View Details
                     <ChevronRight size={16} />

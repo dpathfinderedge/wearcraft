@@ -1,23 +1,54 @@
 'use client';
 
-import React, { useState, useSyncExternalStore } from 'react';
+import React, { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ShoppingCart, User, Menu, X, Search } from 'lucide-react';
-import { useCartStore, useAuthStore } from '@/store';
+import { Heart, ShoppingCart, User, Menu, X } from 'lucide-react';
+import { useCartStore, useAuthStore, useWishlistStore } from '@/store';
 
 export const Navbar: React.FC = () => {
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [accountMenuOpen, setAccountMenuOpen] = useState(false);
+  const accountCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mounted = useSyncExternalStore(
     () => () => undefined,
     () => true,
     () => false
   );
   const { getItemCount } = useCartStore();
-  const { user, isAuthenticated, logout } = useAuthStore();
+  const { user, isAuthenticated, hasCheckedAuth, logout } = useAuthStore();
+  const { items: wishlistItems, hasLoaded: wishlistLoaded, loadWishlist } = useWishlistStore();
 
   const cartItemCount = mounted ? getItemCount() : 0;
+  const wishlistCount = mounted ? wishlistItems.length : 0;
+
+  useEffect(() => {
+    if (mounted && hasCheckedAuth && isAuthenticated && !wishlistLoaded) {
+      void loadWishlist();
+    }
+  }, [hasCheckedAuth, isAuthenticated, loadWishlist, mounted, wishlistLoaded]);
+
+  const openAccountMenu = () => {
+    if (accountCloseTimer.current) {
+      clearTimeout(accountCloseTimer.current);
+      accountCloseTimer.current = null;
+    }
+    setAccountMenuOpen(true);
+  };
+
+  const closeAccountMenu = () => {
+    accountCloseTimer.current = setTimeout(() => {
+      setAccountMenuOpen(false);
+      accountCloseTimer.current = null;
+    }, 180);
+  };
+
+  useEffect(() => () => {
+    if (accountCloseTimer.current) {
+      clearTimeout(accountCloseTimer.current);
+    }
+  }, []);
 
   const handleLogout = async () => {
     await logout();
@@ -55,50 +86,69 @@ export const Navbar: React.FC = () => {
           </div>
 
           <div className="flex items-center space-x-4">
-            <button className="hidden md:block p-2 text-gray-700 hover:text-gray-900 transition">
-              <Search size={19} strokeWidth={1.5} />
-            </button>
+            {mounted && isAuthenticated && (
+                <Link href="/wishlist" aria-label="Wishlist" className="relative p-2 text-muted transition-colors hover:text-ink">
+                  <Heart size={20} strokeWidth={1.5} />
+                  {wishlistCount > 0 && (
+                    <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-brown text-xs font-medium text-white">
+                      {wishlistCount}
+                    </span>
+                  )}
+                </Link>
+              )}
 
             <Link href="/cart" aria-label="Shopping cart" className="relative p-2 text-muted transition-colors hover:text-ink">
               <ShoppingCart size={20} strokeWidth={1.5} />
               {mounted && cartItemCount > 0 && (
-                <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-olive text-xs font-medium text-white">
+                <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-brown text-xs font-medium text-white">
                   {cartItemCount}
                 </span>
               )}
             </Link>
 
             {mounted && isAuthenticated && user ? (
-              <div className="relative group">
-                <button className="hidden md:flex items-center space-x-2 p-2 text-gray-700 hover:text-gray-900 transition">
+              <div
+                className="relative hidden md:block"
+                onMouseEnter={openAccountMenu}
+                onMouseLeave={closeAccountMenu}
+              >
+                <button
+                  type="button"
+                  aria-expanded={accountMenuOpen}
+                  aria-haspopup="menu"
+                  onFocus={openAccountMenu}
+                  className="flex items-center space-x-2 rounded-md p-2 text-gray-700 transition-colors hover:text-gray-900"
+                >
                   <User size={19} strokeWidth={1.5} />
                   <span className="text-sm font-medium text-ink">{user.name}</span>
                 </button>
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-sm shadow-lg py-2 hidden group-hover:block border border-gray-200">
+                <div className={`absolute right-0 top-full w-52 origin-top-right pt-2 transition-all duration-200 ease-out ${accountMenuOpen ? 'visible translate-y-0 opacity-100' : 'invisible -translate-y-2 opacity-0 pointer-events-none'}`}>
+                  <div className="rounded-md border border-line bg-white py-2 shadow-lg">
                   <Link
                     href="/profile"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    onClick={() => setAccountMenuOpen(false)}
+                    className="block px-4 py-2.5 text-sm text-muted transition-colors hover:bg-paper hover:text-ink"
                   >
                     My Profile
                   </Link>
                   <Link
                     href="/orders"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    onClick={() => setAccountMenuOpen(false)}
+                    className="block px-4 py-2.5 text-sm text-muted transition-colors hover:bg-paper hover:text-ink"
                   >
                     Order History
                   </Link>
-                  <Link
-                    href="/wishlist"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                  >
-                    Wishlist
-                  </Link>
                   <button
-                    onClick={() => void handleLogout()}
-                    className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-50"
+                    type="button"
+                    onClick={() => {
+                      setAccountMenuOpen(false);
+                      void handleLogout();
+                    }}
+                    className="mx-2 mt-1 block w-[calc(100%-1rem)] rounded-md bg-brown px-4 py-2.5 text-left text-sm text-white transition-colors hover:bg-brown-dark"
                   >
                     Logout
                   </button>
+                  </div>
                 </div>
               </div>
             ) : (
@@ -114,32 +164,43 @@ export const Navbar: React.FC = () => {
             )}
 
             <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 text-gray-700"
+              type="button"
+              aria-expanded={mobileMenuOpen}
+              aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+              onClick={() => setMobileMenuOpen((open) => !open)}
+              className="rounded-md p-2 text-muted transition-colors hover:bg-paper hover:text-ink md:hidden"
             >
               {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
-          </div>
         </div>
       </div>
 
-      {mobileMenuOpen && (
-        <div className="md:hidden bg-white border-t border-gray-200">
-          <div className="px-4 py-4 space-y-3">
+      <div className={`relative left-1/2 w-screen -translate-x-1/2 overflow-hidden border-t border-line bg-white transition-all duration-300 ease-out md:hidden ${mobileMenuOpen ? 'max-h-[32rem] opacity-100' : 'pointer-events-none max-h-0 opacity-0'}`}>
+          <div className="space-y-1 px-4 py-4">
             {navigation.map((item) => (
               <Link
                 key={item.name}
                 href={item.href}
-                className="block py-2 text-base font-medium text-gray-700 hover:text-gray-900"
+                className="block rounded-md px-3 py-2.5 text-sm font-medium uppercase tracking-[0.08em] text-muted transition-colors hover:bg-paper hover:text-ink"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 {item.name}
               </Link>
             ))}
+            {mounted && isAuthenticated && (
+              <Link
+                href="/wishlist"
+                className="flex items-center justify-between rounded-md px-3 py-2.5 text-sm font-medium uppercase tracking-[0.08em] text-muted transition-colors hover:bg-paper hover:text-ink"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <span>Wishlist</span>
+                {wishlistCount > 0 && <span className="rounded-full bg-brown px-2 py-0.5 text-xs text-white">{wishlistCount}</span>}
+              </Link>
+            )}
             {mounted && !isAuthenticated && (
               <Link
                 href="/auth/login"
-                className="block py-2 text-base font-medium text-gray-900"
+                className="mt-2 block rounded-md bg-brown px-3 py-2.5 text-sm font-medium uppercase tracking-[0.08em] text-white transition-colors hover:bg-brown-dark"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Login
@@ -149,32 +210,25 @@ export const Navbar: React.FC = () => {
               <>
                 <Link
                   href="/profile"
-                  className="block py-2 text-base font-medium text-gray-700"
+                  className="block rounded-md px-3 py-2.5 text-sm font-medium uppercase tracking-[0.08em] text-muted transition-colors hover:bg-paper hover:text-ink"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   My Profile
-                </Link>
-                <Link
-                  href="/wishlist"
-                  className="block py-2 text-base font-medium text-gray-700"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Wishlist
                 </Link>
                 <button
                   onClick={() => {
                     logout();
                     setMobileMenuOpen(false);
                   }}
-                  className="block w-full text-left py-2 text-base font-medium text-red-600"
+                  className="mt-2 block w-full rounded-md bg-brown px-3 py-2.5 text-left text-sm font-medium uppercase tracking-[0.08em] text-white transition-colors hover:bg-brown-dark"
                 >
                   Logout
                 </button>
               </>
             )}
           </div>
-        </div>
-      )}
+          </div>
+      </div>
     </nav>
   );
 };
