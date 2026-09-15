@@ -29,7 +29,11 @@ export async function PATCH(
     await requireAdmin(request);
     const { id } = await params;
     const input = productUpdateSchema.parse(await parseBody<unknown>(request));
-    const product = await prisma.product.update({ where: { id }, data: input });
+    const product = await prisma.product.update({
+      where: { id },
+      data: input,
+      include: { _count: { select: { reviews: true, wishlist: true } } },
+    });
     return successResponse(product, 'Product updated.');
   } catch (error) {
     if (error instanceof z.ZodError) {
