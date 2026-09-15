@@ -22,6 +22,31 @@ export interface AdminReview {
   product: { name: string };
 }
 
+export interface AdminProduct {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  price: number;
+  comparePrice: number | null;
+  category: 'mens' | 'womens' | 'unisex' | 'accessories';
+  images: string[];
+  sizes: string[];
+  colors: string[];
+  material: string | null;
+  care: string | null;
+  featured: boolean;
+  inStock: boolean;
+  stockCount: number;
+  rating: number;
+  reviewCount: number;
+  createdAt: string;
+  updatedAt: string;
+  _count: { reviews: number; wishlist: number };
+}
+
+export type AdminProductInput = Omit<AdminProduct, 'id' | 'rating' | 'reviewCount' | 'createdAt' | 'updatedAt' | '_count'>;
+
 class ApiClient {
   private baseUrl: string;
 
@@ -258,6 +283,30 @@ class ApiClient {
 
   async deleteReview(id: string): Promise<ApiResponse<{ id: string }>> {
     return this.request<{ id: string }>(`/api/admin/reviews/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async getAdminProducts(): Promise<ApiResponse<AdminProduct[]>> {
+    return this.request<AdminProduct[]>('/api/admin/products');
+  }
+
+  async createAdminProduct(data: AdminProductInput): Promise<ApiResponse<AdminProduct>> {
+    return this.request<AdminProduct>('/api/admin/products', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updateAdminProduct(id: string, data: Partial<AdminProductInput>): Promise<ApiResponse<AdminProduct>> {
+    return this.request<AdminProduct>(`/api/admin/products/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deleteAdminProduct(id: string): Promise<ApiResponse<{ id: string }>> {
+    return this.request<{ id: string }>(`/api/admin/products/${id}`, {
       method: 'DELETE',
     });
   }
