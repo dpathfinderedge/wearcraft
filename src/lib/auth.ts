@@ -2,6 +2,7 @@ import { SignJWT, jwtVerify, type JWTPayload as JoseJWTPayload } from 'jose';
 import { cookies } from 'next/headers';
 import { NextRequest } from 'next/server';
 import bcrypt from 'bcryptjs';
+import prisma from '@/lib/prisma';
 const JWT_SECRET = new TextEncoder().encode(
   process.env.JWT_SECRET || 'your-super-secret-jwt-key'
 );
@@ -11,6 +12,7 @@ const TOKEN_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
 export interface JWTPayload extends JoseJWTPayload {
   userId: string;
   email: string;
+  role?: 'CUSTOMER' | 'ADMIN';
 }
 export async function hashPassword(password: string): Promise<string> {
   return bcrypt.hash(password, 12);
@@ -84,4 +86,18 @@ export async function requireAuth(
   }
 
   return user;
+}
+
+export async function requireAdmin(request: NextRequest): Promise<JWTPayload> {
+  const authUser = await requireAuth(request);
+  const user = await prisma.user.findUnique({
+    where: { id: authUser.userId },
+    select: { role: true },
+  });
+
+  if (!user || user.role !== 'ADMIN') {
+    throw new Error('Forbidden');
+  }
+
+  return authUser;
 }

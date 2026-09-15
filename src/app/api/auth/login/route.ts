@@ -41,6 +41,7 @@ export async function POST(request: NextRequest) {
     const token = await createToken({
       userId: user.id,
       email: user.email,
+      role: user.role,
     });
     await setAuthCookie(token);
     const { password, ...userWithoutPassword } = user;

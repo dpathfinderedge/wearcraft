@@ -11,6 +11,7 @@ model User {
   id            String    @id @default(cuid())
   email         String    @unique
   password      String
+  role          UserRole  @default(CUSTOMER)
   firstName     String
   lastName      String
   phone         String?
@@ -118,6 +119,7 @@ model Review {
   title         String?
   comment       String    @db.Text
   verified      Boolean   @default(false)
+  published     Boolean   @default(true)
   helpful       Int       @default(0)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -127,6 +129,10 @@ model Review {
   @@unique([userId, productId])
   @@index([productId])
   @@index([userId])
+}
+enum UserRole {
+  CUSTOMER
+  ADMIN
 }
 model WishlistItem {
   id            String    @id @default(cuid())
