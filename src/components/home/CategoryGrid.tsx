@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 
 interface Category {
@@ -57,10 +58,12 @@ export const CategoryGrid: React.FC = () => {
               className="group relative aspect-[3/4] overflow-hidden rounded-sm bg-gray-100"
             >
 
-              <img
+              <Image
                 src={category.image}
                 alt={category.name}
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                className="object-cover transition-transform duration-700 group-hover:scale-110"
               />
 
 
