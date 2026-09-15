@@ -45,6 +45,11 @@ export interface AdminProduct {
   _count: { reviews: number; wishlist: number };
 }
 
+export interface UploadedImage {
+  url: string;
+  publicId: string;
+}
+
 export type AdminProductInput = Omit<AdminProduct, 'id' | 'rating' | 'reviewCount' | 'createdAt' | 'updatedAt' | '_count'>;
 
 class ApiClient {
@@ -66,7 +71,7 @@ class ApiClient {
         ...options,
         signal: options?.signal || controller.signal,
         headers: {
-          'Content-Type': 'application/json',
+          ...(options?.body instanceof FormData ? {} : { 'Content-Type': 'application/json' }),
           ...options?.headers,
         },
         credentials: 'include', // Important for cookies
@@ -289,6 +294,16 @@ class ApiClient {
 
   async getAdminProducts(): Promise<ApiResponse<AdminProduct[]>> {
     return this.request<AdminProduct[]>('/api/admin/products');
+  }
+
+  async uploadAdminImages(files: File[]): Promise<ApiResponse<UploadedImage[]>> {
+    const body = new FormData();
+    files.forEach((file) => body.append('files', file));
+    return this.request<UploadedImage[]>('/api/admin/uploads', {
+      method: 'POST',
+      body,
+      headers: {},
+    });
   }
 
   async createAdminProduct(data: AdminProductInput): Promise<ApiResponse<AdminProduct>> {

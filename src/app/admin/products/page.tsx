@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useEffect, useState } from 'react';
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { Pencil, Plus, Trash2, X } from 'lucide-react';
 import { Button, Input } from '@/components/ui';
 import { apiClient, type AdminProduct, type AdminProductInput } from '@/lib/api-client';
@@ -32,6 +32,7 @@ export default function AdminProductsPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -90,6 +91,21 @@ export default function AdminProductsPage() {
     setIsSaving(false);
   };
 
+  const uploadImages = async (event: ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || []);
+    if (files.length === 0) return;
+    setIsUploading(true);
+    setError(null);
+    const response = await apiClient.uploadAdminImages(files);
+    if (response.success && response.data) {
+      setForm((current) => ({ ...current, images: response.data?.map((image) => image.url) || [] }));
+    } else {
+      setError(response.error || 'Unable to upload images.');
+    }
+    setIsUploading(false);
+    event.target.value = '';
+  };
+
   const removeProduct = async (product: AdminProduct) => {
     if (!window.confirm(`Delete ${product.name}?`)) return;
     const response = await apiClient.deleteAdminProduct(product.id);
@@ -121,7 +137,11 @@ export default function AdminProductsPage() {
             <label className="text-sm text-muted">Category<select className="mt-2 w-full border border-line bg-white px-3.5 py-3 text-sm text-ink" value={form.category} onChange={(event) => setForm({ ...form, category: event.target.value as AdminProductInput['category'] })}><option value="womens">Womens</option><option value="mens">Mens</option><option value="unisex">Unisex</option><option value="accessories">Accessories</option></select></label>
             <Input label="Stock count" required type="number" min="0" step="1" value={form.stockCount} onChange={(event) => setForm({ ...form, stockCount: Number(event.target.value), inStock: Number(event.target.value) > 0 })} />
             <div className="md:col-span-2"><label className="text-xs font-medium uppercase tracking-[0.1em] text-muted">Description<textarea required minLength={10} className="mt-2 min-h-28 w-full border border-line bg-white px-3.5 py-3 text-sm text-ink outline-none focus:border-olive focus:ring-1 focus:ring-olive" value={form.description} onChange={(event) => setForm({ ...form, description: event.target.value })} /></label></div>
-            <Input label="Image URLs" required helperText="Comma-separated HTTPS image URLs." value={form.images.join(', ')} onChange={(event) => setForm({ ...form, images: toList(event.target.value) })} />
+            <div>
+              <label className="text-xs font-medium uppercase tracking-[0.1em] text-muted">Product images</label>
+              <input type="file" accept="image/jpeg,image/png,image/webp" multiple onChange={uploadImages} disabled={isUploading} className="mt-2 block w-full border border-line bg-white px-3.5 py-3 text-sm text-ink file:mr-4 file:border-0 file:bg-brown file:px-3 file:py-2 file:text-xs file:uppercase file:text-white" />
+              <p className="mt-1 text-xs text-muted">{isUploading ? 'Uploading images...' : `${form.images.length} image${form.images.length === 1 ? '' : 's'} selected. JPG, PNG, or WebP up to 5MB each.`}</p>
+            </div>
             <Input label="Sizes" helperText="Comma-separated values." value={form.sizes.join(', ')} onChange={(event) => setForm({ ...form, sizes: toList(event.target.value) })} />
             <Input label="Colors" value={form.colors.join(', ')} onChange={(event) => setForm({ ...form, colors: toList(event.target.value) })} />
             <Input label="Material" value={form.material ?? ''} onChange={(event) => setForm({ ...form, material: event.target.value || null })} />

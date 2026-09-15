@@ -40,5 +40,6 @@ export function mapUserFromApi(apiUser: ApiUser) {
     avatar: undefined, // Add if API provides avatar
     phone: apiUser.phone ? String(apiUser.phone) : undefined,
     createdAt: String(apiUser.createdAt),
+    role: apiUser.role,
   };
 }
