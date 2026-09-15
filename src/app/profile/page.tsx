@@ -170,34 +170,34 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div className="min-h-screen bg-paper">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
         <div className="grid gap-8 lg:grid-cols-[280px_1fr]">
           <aside className="space-y-6">
-            <div className="rounded-sm border border-gray-200 p-6">
+            <div className="rounded-md border border-line bg-white p-6">
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 text-2xl">
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#eee8df] text-2xl text-brown">
                   {profileName.charAt(0).toUpperCase()}
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500 uppercase tracking-wide">Welcome back</p>
-                  <h1 className="text-2xl font-semibold text-gray-900">{profileName}</h1>
-                  <p className="text-sm text-gray-600">Manage your profile and shipping addresses.</p>
+                  <p className="text-xs uppercase tracking-[0.16em] text-brown">Welcome back</p>
+                  <h1 className="text-2xl font-light tracking-[-0.03em] text-ink">{profileName}</h1>
+                  <p className="text-sm text-muted">Manage your profile and shipping addresses.</p>
                 </div>
               </div>
             </div>
 
-            <div className="rounded-sm border border-gray-200 bg-white p-4">
+            <div className="rounded-md border border-line bg-white p-4">
               <div className="space-y-2">
                 {tabOptions.map((tab) => (
                   <button
                     key={tab.id}
                     type="button"
                     onClick={() => setActiveTab(tab.id)}
-                    className={`w-full text-left rounded-sm px-4 py-3 transition ${
+                    className={`w-full rounded-md px-4 py-3 text-left text-sm transition ${
                       activeTab === tab.id
-                        ? 'bg-gray-900 text-white'
-                        : 'text-gray-700 hover:bg-gray-50'
+                        ? 'bg-brown text-white'
+                        : 'text-muted hover:bg-paper hover:text-ink'
                     }`}
                   >
                     {tab.label}
@@ -209,12 +209,12 @@ export default function ProfilePage() {
 
           <section className="space-y-8">
             {activeTab === 'profile' && (
-              <div className="rounded-sm border border-gray-200 bg-white p-6">
+              <div className="rounded-md border border-line bg-white p-6 sm:p-8">
                 <div className="flex items-center gap-3 mb-6">
                   <User size={20} />
                   <div>
-                    <h2 className="text-xl font-semibold text-gray-900">Profile information</h2>
-                    <p className="text-sm text-gray-600">Update your name and contact details.</p>
+                    <h2 className="text-2xl font-light tracking-[-0.03em] text-ink">Profile information</h2>
+                    <p className="text-sm text-muted">Update your name and contact details.</p>
                   </div>
                 </div>
                 <form onSubmit={profileForm.handleSubmit(onSubmitProfile)} className="space-y-6">
@@ -236,7 +236,7 @@ export default function ProfilePage() {
                     label="Email address"
                     value={user.email}
                     readOnly
-                    className="bg-gray-50 cursor-not-allowed"
+                    className="cursor-not-allowed rounded-md bg-paper"
                   />
                   <Input
                     label="Phone number"
@@ -253,13 +253,13 @@ export default function ProfilePage() {
 
             {activeTab === 'addresses' && (
               <div className="space-y-6">
-                <div className="rounded-sm border border-gray-200 bg-white p-6">
+                <div className="rounded-md border border-line bg-white p-6 sm:p-8">
                   <div className="flex items-center justify-between gap-4 mb-6">
                     <div className="flex items-center gap-3">
                       <MapPin size={20} />
                       <div>
-                        <h2 className="text-xl font-semibold text-gray-900">Shipping addresses</h2>
-                        <p className="text-sm text-gray-600">Store your delivery addresses for faster checkout.</p>
+                        <h2 className="text-2xl font-light tracking-[-0.03em] text-ink">Shipping addresses</h2>
+                        <p className="text-sm text-muted">Store your delivery addresses for faster checkout.</p>
                       </div>
                     </div>
                     <Button type="button" variant="secondary" size="sm" onClick={() => setEditingAddress(null)}>
@@ -268,23 +268,23 @@ export default function ProfilePage() {
                   </div>
 
                   {addresses.length === 0 ? (
-                    <div className="rounded-sm border border-dashed border-gray-300 p-8 text-center text-sm text-gray-600">
+                    <div className="rounded-md border border-dashed border-line bg-paper p-8 text-center text-sm text-muted">
                       No saved addresses yet. Add one to make checkout faster.
                     </div>
                   ) : (
                     <div className="grid gap-4">
                       {addresses.map((address) => (
-                        <div key={address.id} className="rounded-sm border border-gray-200 p-4 bg-gray-50">
+                        <div key={address.id} className="rounded-md border border-line bg-paper p-4">
                           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                             <div>
-                              <p className="font-medium text-gray-900">
+                              <p className="font-medium text-ink">
                                 {address.firstName} {address.lastName}
                                 {address.isDefault && <span className="ml-2 text-xs uppercase tracking-wide text-green-700">Default</span>}
                               </p>
-                              <p className="text-sm text-gray-600">
+                              <p className="text-sm text-muted">
                                 {address.street}, {address.city}, {address.state} {address.postalCode}, {address.country}
                               </p>
-                              <p className="text-sm text-gray-600 mt-2">{address.phone}</p>
+                              <p className="mt-2 text-sm text-muted">{address.phone}</p>
                             </div>
                             <div className="flex flex-wrap gap-2">
                               {!address.isDefault && (
@@ -321,12 +321,12 @@ export default function ProfilePage() {
                   )}
                 </div>
 
-                <div className="rounded-sm border border-gray-200 bg-white p-6">
+                <div className="rounded-md border border-line bg-white p-6 sm:p-8">
                   <div className="flex items-center gap-3 mb-6">
                     <Plus size={20} />
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900">{editingAddress ? 'Edit address' : 'Add new address'}</h3>
-                      <p className="text-sm text-gray-600">Save a shipping address and optionally make it the default.</p>
+                      <h3 className="text-2xl font-light tracking-[-0.03em] text-ink">{editingAddress ? 'Edit address' : 'Add new address'}</h3>
+                      <p className="text-sm text-muted">Save a shipping address and optionally make it the default.</p>
                     </div>
                   </div>
                   <form onSubmit={addressForm.handleSubmit(onSubmitAddress)} className="space-y-6">

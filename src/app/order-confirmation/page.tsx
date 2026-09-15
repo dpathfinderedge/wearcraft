@@ -69,7 +69,7 @@ function OrderConfirmationContent() {
 
   if (loading || !order) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-paper">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading order details...</p>
@@ -79,21 +79,21 @@ function OrderConfirmationContent() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div className="min-h-screen bg-paper">
+      <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
-            <CheckCircle size={32} className="text-green-600" />
+          <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-[#edf3eb]">
+            <CheckCircle size={32} className="text-olive" />
           </div>
-          <h1 className="text-3xl md:text-4xl font-light text-gray-900 mb-2">Order Confirmed!</h1>
-          <p className="text-lg text-gray-600">Thank you for your purchase. Your order has been received.</p>
+          <h1 className="mb-2 text-4xl font-light tracking-[-0.04em] text-ink md:text-5xl">Order confirmed</h1>
+          <p className="text-lg text-muted">Thank you for your purchase. Your order has been received.</p>
         </div>
 
-        <div className="bg-gray-50 rounded-sm p-6 mb-8">
+        <div className="mb-8 rounded-md border border-line bg-white p-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
-              <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Order Number</p>
-              <p className="text-base font-semibold text-gray-900">{order.orderNumber}</p>
+              <p className="mb-1 text-xs uppercase tracking-[0.12em] text-muted">Order number</p>
+              <p className="text-base font-semibold text-ink">{order.orderNumber}</p>
             </div>
             <div>
               <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Order Date</p>
@@ -106,12 +106,12 @@ function OrderConfirmationContent() {
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-sm p-6 mb-8">
-          <h2 className="text-lg font-semibold text-gray-900 mb-6">What happens next?</h2>
+        <div className="mb-8 rounded-md border border-line bg-white p-6">
+          <h2 className="mb-6 text-2xl font-light tracking-[-0.03em] text-ink">What happens next?</h2>
           <div className="space-y-4">
             <div className="flex items-start gap-4">
-              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <Mail size={20} className="text-blue-600" />
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#f5efe9]">
+                <Mail size={20} className="text-brown" />
               </div>
               <div>
                 <h3 className="font-medium text-gray-900 mb-1">Order Confirmation Email</h3>
@@ -139,12 +139,12 @@ function OrderConfirmationContent() {
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-sm p-6 mb-8">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Order Items ({order.items.length})</h2>
+        <div className="mb-8 rounded-md border border-line bg-white p-6">
+          <h2 className="mb-4 text-2xl font-light tracking-[-0.03em] text-ink">Order items ({order.items.length})</h2>
           <div className="space-y-4">
             {order.items.map((item) => (
               <div key={item.id} className="flex gap-4 pb-4 border-b border-gray-200 last:border-0 last:pb-0">
-                <div className="relative w-20 h-24 bg-gray-100 flex-shrink-0 overflow-hidden">
+                <div className="relative h-24 w-20 shrink-0 overflow-hidden rounded-md bg-[#ebe8e1]">
                   <Image src={item.image} alt={item.name} fill className="object-cover" sizes="80px" />
                 </div>
                 <div className="flex-1">
@@ -160,10 +160,10 @@ function OrderConfirmationContent() {
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-sm p-6 mb-8">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Shipping Address</h2>
-          <div className="text-sm text-gray-600">
-            <p className="font-medium text-gray-900">{order.address.firstName} {order.address.lastName}</p>
+        <div className="mb-8 rounded-md border border-line bg-white p-6">
+          <h2 className="mb-4 text-2xl font-light tracking-[-0.03em] text-ink">Shipping address</h2>
+          <div className="text-sm text-muted">
+            <p className="font-medium text-ink">{order.address.firstName} {order.address.lastName}</p>
             <p>{order.address.address}</p>
             <p>{order.address.city}, {order.address.state} {order.address.zipCode}</p>
             <p>{order.address.country}</p>
