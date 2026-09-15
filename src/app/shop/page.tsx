@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
-import { products } from '@/data/products';
+import React, { useEffect, useState, useMemo } from 'react';
 import { ProductCategory, SortOption } from '@/types/product';
 import { FilterSidebar, SearchBar, ProductGrid } from '@/components/shop';
 import { Button } from '@/components/ui';
 import { SlidersHorizontal } from 'lucide-react';
+import { apiClient } from '@/lib/api-client';
+import type { Product } from '@/types/product';
 
 export default function ShopPage() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -14,6 +15,29 @@ export default function ShopPage() {
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 200]);
   const [sortBy, setSortBy] = useState<SortOption>('featured');
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    void apiClient.getProducts({ limit: 100, sort: 'featured' }).then((response) => {
+      if (cancelled) return;
+      if (response.success && response.data) {
+        setProducts(response.data.products.map((product) => ({
+          ...product,
+          originalPrice: product.comparePrice ?? undefined,
+          material: product.material ?? undefined,
+          care: product.care ?? undefined,
+        })));
+        setLoadError(null);
+      } else {
+        setLoadError(response.error || 'Unable to load products.');
+      }
+      setIsLoading(false);
+    });
+    return () => { cancelled = true; };
+  }, []);
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
       if (searchQuery && !product.name.toLowerCase().includes(searchQuery.toLowerCase())) {
@@ -34,7 +58,7 @@ export default function ShopPage() {
 
       return true;
     });
-  }, [searchQuery, selectedCategory, selectedSizes, priceRange]);
+  }, [products, searchQuery, selectedCategory, selectedSizes, priceRange]);
   const sortedProducts = useMemo(() => {
     const sorted = [...filteredProducts];
 
@@ -77,9 +101,11 @@ export default function ShopPage() {
             Find your everyday pieces
           </h1>
           <p className="text-muted">
-            {sortedProducts.length} {sortedProducts.length === 1 ? 'product' : 'products'}
+            {isLoading ? 'Loading the collection...' : `${sortedProducts.length} ${sortedProducts.length === 1 ? 'product' : 'products'}`}
           </p>
         </div>
+
+        {loadError && <p className="mb-8 border border-[#e4c9c0] bg-[#fbefeb] p-4 text-sm text-clay">{loadError}</p>}
 
 
         <div className="flex flex-col md:flex-row gap-4 mb-8">
@@ -155,7 +181,7 @@ export default function ShopPage() {
 
 
           <div className="flex-1">
-            <ProductGrid products={sortedProducts} />
+            <ProductGrid products={sortedProducts} isLoading={isLoading} />
           </div>
         </div>
       </div>

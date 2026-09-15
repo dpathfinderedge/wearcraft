@@ -143,7 +143,28 @@ class ApiClient {
     sort?: string;
     page?: number;
     limit?: number;
-  }) {
+  }): Promise<ApiResponse<{
+    products: Array<{
+      id: string;
+      name: string;
+      slug: string;
+      description: string;
+      price: number;
+      comparePrice: number | null;
+      category: 'mens' | 'womens' | 'unisex' | 'accessories';
+      images: string[];
+      sizes: string[];
+      colors: string[];
+      material: string | null;
+      care: string | null;
+      rating: number;
+      reviewCount: number;
+      inStock: boolean;
+      featured: boolean;
+      createdAt: string;
+    }>;
+    pagination: { page: number; limit: number; total: number; totalPages: number };
+  }>> {
     const queryParams = new URLSearchParams();
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
