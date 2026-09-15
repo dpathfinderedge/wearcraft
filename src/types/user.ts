@@ -5,6 +5,7 @@ export interface User {
   avatar?: string;
   phone?: string;
   createdAt: string;
+  role?: 'CUSTOMER' | 'ADMIN';
 }
 
 export interface Address {
@@ -44,6 +45,7 @@ export interface ApiUser {
   phone?: string;
   createdAt: string;
   updatedAt: string;
+  role?: 'CUSTOMER' | 'ADMIN';
   addresses?: ApiAddress[];
 }
 

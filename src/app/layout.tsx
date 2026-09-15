@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import { Navbar, Footer } from '@/components/layouts';
+import { AppChrome } from '@/components/layouts/AppChrome';
 import { AuthProvider } from '@/components/providers/AuthProvider';
 import { ToastProvider } from '@/components/ui';
 
@@ -19,9 +19,7 @@ export default function RootLayout({
       <body className="font-sans antialiased">
         <AuthProvider>
           <ToastProvider>
-            <Navbar />
-            <main className="min-h-screen">{children}</main>
-            <Footer />
+            <AppChrome>{children}</AppChrome>
           </ToastProvider>
         </AuthProvider>
       </body>

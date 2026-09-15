@@ -29,7 +29,7 @@ function LoginForm() {
 
     if (result.success) {
       showToast('Login successful!', 'success');
-      const redirect = searchParams.get('redirect') || '/';
+      const redirect = searchParams.get('redirect') || (useAuthStore.getState().user?.role === 'ADMIN' ? '/admin' : '/');
       router.push(redirect);
     } else {
       showToast(result.error || 'Login failed', 'error');
