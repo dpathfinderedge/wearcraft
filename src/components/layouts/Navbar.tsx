@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useSyncExternalStore } from 'react';
+import React, { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Heart, ShoppingCart, User, Menu, X } from 'lucide-react';
@@ -10,6 +10,7 @@ export const Navbar: React.FC = () => {
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
+  const accountCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mounted = useSyncExternalStore(
     () => () => undefined,
     () => true,
@@ -28,16 +29,26 @@ export const Navbar: React.FC = () => {
     }
   }, [hasCheckedAuth, isAuthenticated, loadWishlist, mounted, wishlistLoaded]);
 
-  useEffect(() => {
-    if (!accountMenuOpen) return;
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setAccountMenuOpen(false);
-      }
-    };
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [accountMenuOpen]);
+  const openAccountMenu = () => {
+    if (accountCloseTimer.current) {
+      clearTimeout(accountCloseTimer.current);
+      accountCloseTimer.current = null;
+    }
+    setAccountMenuOpen(true);
+  };
+
+  const closeAccountMenu = () => {
+    accountCloseTimer.current = setTimeout(() => {
+      setAccountMenuOpen(false);
+      accountCloseTimer.current = null;
+    }, 180);
+  };
+
+  useEffect(() => () => {
+    if (accountCloseTimer.current) {
+      clearTimeout(accountCloseTimer.current);
+    }
+  }, []);
 
   const handleLogout = async () => {
     await logout();
@@ -76,32 +87,36 @@ export const Navbar: React.FC = () => {
 
           <div className="flex items-center space-x-4">
             {mounted && isAuthenticated && (
-              <Link href="/wishlist" aria-label="Wishlist" className="relative hidden p-2 text-muted transition-colors hover:text-ink md:block">
-                <Heart size={20} strokeWidth={1.5} />
-                {wishlistCount > 0 && (
-                  <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-brown text-xs font-medium text-white">
-                    {wishlistCount}
-                  </span>
-                )}
-              </Link>
-            )}
+                <Link href="/wishlist" aria-label="Wishlist" className="relative p-2 text-muted transition-colors hover:text-ink">
+                  <Heart size={20} strokeWidth={1.5} />
+                  {wishlistCount > 0 && (
+                    <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-brown text-xs font-medium text-white">
+                      {wishlistCount}
+                    </span>
+                  )}
+                </Link>
+              )}
 
             <Link href="/cart" aria-label="Shopping cart" className="relative p-2 text-muted transition-colors hover:text-ink">
               <ShoppingCart size={20} strokeWidth={1.5} />
               {mounted && cartItemCount > 0 && (
-                <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-olive text-xs font-medium text-white">
+                <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-brown text-xs font-medium text-white">
                   {cartItemCount}
                 </span>
               )}
             </Link>
 
             {mounted && isAuthenticated && user ? (
-              <div className="relative hidden md:block">
+              <div
+                className="relative hidden md:block"
+                onMouseEnter={openAccountMenu}
+                onMouseLeave={closeAccountMenu}
+              >
                 <button
                   type="button"
                   aria-expanded={accountMenuOpen}
                   aria-haspopup="menu"
-                  onClick={() => setAccountMenuOpen((open) => !open)}
+                  onFocus={openAccountMenu}
                   className="flex items-center space-x-2 rounded-md p-2 text-gray-700 transition-colors hover:text-gray-900"
                 >
                   <User size={19} strokeWidth={1.5} />
@@ -123,20 +138,13 @@ export const Navbar: React.FC = () => {
                   >
                     Order History
                   </Link>
-                  <Link
-                    href="/wishlist"
-                    onClick={() => setAccountMenuOpen(false)}
-                    className="block px-4 py-2.5 text-sm text-muted transition-colors hover:bg-paper hover:text-ink"
-                  >
-                    Wishlist
-                  </Link>
                   <button
                     type="button"
                     onClick={() => {
                       setAccountMenuOpen(false);
                       void handleLogout();
                     }}
-                    className="block w-full px-4 py-2.5 text-left text-sm text-clay transition-colors hover:bg-paper"
+                    className="mx-2 mt-1 block w-[calc(100%-1rem)] rounded-md bg-brown px-4 py-2.5 text-left text-sm text-white transition-colors hover:bg-brown-dark"
                   >
                     Logout
                   </button>
@@ -167,7 +175,7 @@ export const Navbar: React.FC = () => {
         </div>
       </div>
 
-      <div className={`overflow-hidden border-t border-line bg-white transition-all duration-300 ease-out md:hidden ${mobileMenuOpen ? 'max-h-[32rem] opacity-100' : 'pointer-events-none max-h-0 opacity-0'}`}>
+      <div className={`relative left-1/2 w-screen -translate-x-1/2 overflow-hidden border-t border-line bg-white transition-all duration-300 ease-out md:hidden ${mobileMenuOpen ? 'max-h-[32rem] opacity-100' : 'pointer-events-none max-h-0 opacity-0'}`}>
           <div className="space-y-1 px-4 py-4">
             {navigation.map((item) => (
               <Link
@@ -179,6 +187,16 @@ export const Navbar: React.FC = () => {
                 {item.name}
               </Link>
             ))}
+            {mounted && isAuthenticated && (
+              <Link
+                href="/wishlist"
+                className="flex items-center justify-between rounded-md px-3 py-2.5 text-sm font-medium uppercase tracking-[0.08em] text-muted transition-colors hover:bg-paper hover:text-ink"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <span>Wishlist</span>
+                {wishlistCount > 0 && <span className="rounded-full bg-brown px-2 py-0.5 text-xs text-white">{wishlistCount}</span>}
+              </Link>
+            )}
             {mounted && !isAuthenticated && (
               <Link
                 href="/auth/login"
@@ -197,19 +215,12 @@ export const Navbar: React.FC = () => {
                 >
                   My Profile
                 </Link>
-                <Link
-                  href="/wishlist"
-                  className="block rounded-md px-3 py-2.5 text-sm font-medium uppercase tracking-[0.08em] text-muted transition-colors hover:bg-paper hover:text-ink"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Wishlist
-                </Link>
                 <button
                   onClick={() => {
                     logout();
                     setMobileMenuOpen(false);
                   }}
-                  className="block w-full rounded-md px-3 py-2.5 text-left text-sm font-medium uppercase tracking-[0.08em] text-clay transition-colors hover:bg-paper"
+                  className="mt-2 block w-full rounded-md bg-brown px-3 py-2.5 text-left text-sm font-medium uppercase tracking-[0.08em] text-white transition-colors hover:bg-brown-dark"
                 >
                   Logout
                 </button>
