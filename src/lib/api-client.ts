@@ -50,6 +50,59 @@ export interface UploadedImage {
   publicId: string;
 }
 
+export type AdminOrderStatus = 'PENDING' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
+export type AdminPaymentStatus = 'PENDING' | 'PAID' | 'FAILED' | 'REFUNDED';
+
+export interface AdminOrderItem {
+  id: string;
+  name: string;
+  quantity: number;
+  price: number;
+  image: string;
+  size: string | null;
+  color: string | null;
+}
+
+export interface AdminOrder {
+  id: string;
+  orderNumber: string;
+  status: AdminOrderStatus;
+  paymentStatus: AdminPaymentStatus;
+  paymentMethod: string;
+  paymentRef: string | null;
+  subtotal: number;
+  shipping: number;
+  tax: number;
+  total: number;
+  notes: string | null;
+  createdAt: string;
+  updatedAt: string;
+  user: { id: string; firstName: string; lastName: string; email: string; phone?: string | null };
+  address: {
+    firstName: string;
+    lastName: string;
+    address: string;
+    city: string;
+    state: string;
+    zipCode: string;
+    country: string;
+    phone: string;
+  };
+  items: AdminOrderItem[];
+}
+
+export interface AdminOrdersResponse {
+  orders: AdminOrder[];
+  pagination: { page: number; limit: number; total: number; totalPages: number };
+  summary: {
+    allOrders: number;
+    needsAttention: number;
+    paidRevenue: number;
+    todayOrders: number;
+    byStatus: Partial<Record<AdminOrderStatus, number>>;
+  };
+}
+
 export type AdminProductInput = Omit<AdminProduct, 'id' | 'rating' | 'reviewCount' | 'createdAt' | 'updatedAt' | '_count'>;
 
 class ApiClient {
@@ -344,6 +397,31 @@ class ApiClient {
   async deleteAdminProduct(id: string): Promise<ApiResponse<{ id: string }>> {
     return this.request<{ id: string }>(`/api/admin/products/${id}`, {
       method: 'DELETE',
+    });
+  }
+
+  async getAdminOrders(params: {
+    search?: string;
+    status?: AdminOrderStatus;
+    payment?: AdminPaymentStatus;
+    page?: number;
+    limit?: number;
+  } = {}): Promise<ApiResponse<AdminOrdersResponse>> {
+    const query = new URLSearchParams();
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== '') query.set(key, String(value));
+    });
+    return this.request<AdminOrdersResponse>(`/api/admin/orders?${query.toString()}`);
+  }
+
+  async getAdminOrder(id: string): Promise<ApiResponse<AdminOrder>> {
+    return this.request<AdminOrder>(`/api/admin/orders/${id}`);
+  }
+
+  async updateAdminOrderStatus(id: string, status: AdminOrderStatus): Promise<ApiResponse<AdminOrder>> {
+    return this.request<AdminOrder>(`/api/admin/orders/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status }),
     });
   }
 
