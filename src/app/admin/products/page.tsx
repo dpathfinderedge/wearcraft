@@ -122,9 +122,9 @@ export default function AdminProductsPage() {
           <p className="mt-2 text-sm text-muted">Create and maintain the pieces in your collection.</p>
         </header>
 
-        {error && <div className="mb-6 border border-[#e4c9c0] bg-[#fbefeb] p-4 text-sm text-clay">{error}</div>}
+        {error && <div className="mb-6 rounded-2xl border border-[#e4c9c0] bg-[#fbefeb] p-4 text-sm text-clay">{error}</div>}
 
-        <form onSubmit={saveProduct} className="mb-10 rounded-md border border-line bg-white p-5 sm:p-7">
+        <form onSubmit={saveProduct} className="mb-10 rounded-2xl border border-line bg-white p-5 sm:p-7">
           <div className="mb-6 flex items-center justify-between">
             <h2 className="text-xl font-medium text-ink">{editingId ? 'Edit product' : 'Add product'}</h2>
             {editingId && <Button type="button" variant="ghost" size="sm" onClick={resetForm}><X size={15} /> Cancel</Button>}
@@ -152,7 +152,7 @@ export default function AdminProductsPage() {
         </form>
 
         {isLoading ? <p className="border border-line bg-white p-8 text-sm text-muted">Loading products...</p> : products.length === 0 ? <p className="border border-dashed border-line bg-white p-10 text-center text-sm text-muted">No products found.</p> : (
-          <div className="overflow-x-auto rounded-md border border-line bg-white">
+          <div className="overflow-x-auto rounded-2xl border border-line bg-white">
             <table className="w-full min-w-[720px] text-left text-sm">
               <thead className="border-b border-line bg-[#faf9f6] text-xs uppercase tracking-[0.1em] text-muted"><tr><th className="px-5 py-4">Product</th><th className="px-5 py-4">Price</th><th className="px-5 py-4">Stock</th><th className="px-5 py-4">Status</th><th className="px-5 py-4 text-right">Actions</th></tr></thead>
               <tbody>{products.map((product) => <tr key={product.id} className="border-b border-line last:border-0"><td className="px-5 py-4"><p className="font-medium text-ink">{product.name}</p><p className="text-xs text-muted">{product.category} · {product._count.reviews} reviews</p></td><td className="px-5 py-4 text-ink">${product.price.toFixed(2)}</td><td className="px-5 py-4 text-muted">{product.stockCount}</td><td className="px-5 py-4"><span className={product.inStock ? 'text-olive' : 'text-clay'}>{product.inStock ? 'Available' : 'Hidden'}</span></td><td className="px-5 py-4"><div className="flex justify-end gap-2"><Button size="sm" variant="outline" onClick={() => editProduct(product)}><Pencil size={14} /> Edit</Button><Button size="sm" variant="danger" onClick={() => void removeProduct(product)}><Trash2 size={14} /></Button></div></td></tr>)}</tbody>

@@ -78,13 +78,13 @@ export default function AdminReviewsPage() {
           <div className="flex items-center gap-2 text-sm text-muted"><ShieldAlert size={17} className="text-brown" /> {pendingCount} hidden</div>
         </header>
 
-        {isLoading && <p className="rounded-md border border-line bg-white p-8 text-sm text-muted">Loading moderation queue...</p>}
-        {!isLoading && error && <div className="rounded-md border border-[#e4c9c0] bg-[#fbefeb] p-5 text-sm text-clay"><p>{error}</p><button type="button" onClick={() => void loadReviews()} className="mt-3 underline underline-offset-4">Try again</button></div>}
-        {!isLoading && !error && reviews.length === 0 && <p className="rounded-md border border-dashed border-line bg-white p-10 text-center text-sm text-muted">No reviews have been submitted yet.</p>}
+        {isLoading && <p className="rounded-2xl border border-line bg-white p-8 text-sm text-muted">Loading moderation queue...</p>}
+        {!isLoading && error && <div className="rounded-2xl border border-[#e4c9c0] bg-[#fbefeb] p-5 text-sm text-clay"><p>{error}</p><button type="button" onClick={() => void loadReviews()} className="mt-3 underline underline-offset-4">Try again</button></div>}
+        {!isLoading && !error && reviews.length === 0 && <p className="rounded-2xl border border-dashed border-line bg-white p-10 text-center text-sm text-muted">No reviews have been submitted yet.</p>}
         {!isLoading && !error && reviews.length > 0 && (
           <div className="space-y-4">
             {reviews.map((review) => (
-              <article key={review.id} className="rounded-md border border-line bg-white p-5 sm:p-6">
+              <article key={review.id} className="rounded-2xl border border-line bg-white p-5 sm:p-6">
                 <div className="flex flex-col justify-between gap-4 sm:flex-row">
                   <div>
                     <div className="flex flex-wrap items-center gap-2">

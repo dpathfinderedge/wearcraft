@@ -103,6 +103,50 @@ export interface AdminOrdersResponse {
   };
 }
 
+export interface AdminCustomer {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string | null;
+  createdAt: string;
+  _count: { orders: number; reviews: number; wishlist: number };
+}
+
+export interface AdminCustomersResponse {
+  customers: AdminCustomer[];
+  pagination: { page: number; limit: number; total: number; totalPages: number };
+  summary: { allCustomers: number; recentCustomers: number; customersWithOrders: number };
+}
+
+export interface AdminCustomerDetail extends AdminCustomer {
+  updatedAt: string;
+  addresses: Array<{
+    id: string;
+    firstName: string;
+    lastName: string;
+    address: string;
+    city: string;
+    state: string;
+    zipCode: string;
+    country: string;
+    phone: string;
+    isDefault: boolean;
+  }>;
+  orders: Array<{
+    id: string;
+    orderNumber: string;
+    status: AdminOrderStatus;
+    paymentStatus: AdminPaymentStatus;
+    total: number;
+    createdAt: string;
+    items: Array<{ id: string; name: string; quantity: number }>;
+    address: { city: string; state: string; country: string };
+  }>;
+  lifetimePaid: number;
+  paidOrderCount: number;
+}
+
 export type AdminProductInput = Omit<AdminProduct, 'id' | 'rating' | 'reviewCount' | 'createdAt' | 'updatedAt' | '_count'>;
 
 class ApiClient {
@@ -423,6 +467,18 @@ class ApiClient {
       method: 'PATCH',
       body: JSON.stringify({ status }),
     });
+  }
+
+  async getAdminCustomers(params: { search?: string; page?: number; limit?: number } = {}): Promise<ApiResponse<AdminCustomersResponse>> {
+    const query = new URLSearchParams();
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== '') query.set(key, String(value));
+    });
+    return this.request<AdminCustomersResponse>(`/api/admin/customers?${query.toString()}`);
+  }
+
+  async getAdminCustomer(id: string): Promise<ApiResponse<AdminCustomerDetail>> {
+    return this.request<AdminCustomerDetail>(`/api/admin/customers/${id}`);
   }
 
   async getWishlist(): Promise<ApiResponse<unknown[]>> {
