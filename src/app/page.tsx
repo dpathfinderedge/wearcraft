@@ -2,6 +2,8 @@ import { CategoryGrid, FAQ, FeaturedProducts, Features, HeroSection, Newsletter 
 import prisma from '@/lib/prisma';
 import type { Product } from '@/types/product';
 
+export const dynamic = 'force-dynamic';
+
 function toProductCategory(category: string): Product['category'] {
   switch (category) {
     case 'mens':

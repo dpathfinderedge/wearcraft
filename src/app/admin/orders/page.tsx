@@ -128,33 +128,33 @@ export default function AdminOrdersPage() {
             <h1 className="text-3xl font-light tracking-[-0.04em] text-ink sm:text-4xl">Order desk</h1>
             <p className="mt-2 max-w-xl text-sm leading-6 text-muted">Follow every order from payment confirmation to the customer’s door.</p>
           </div>
-          <div className="flex items-center gap-2 text-xs text-muted"><span className="h-2 w-2 rounded-full bg-olive" /> Live order overview</div>
+          <div className="flex items-center gap-2 text-xs text-muted"><span className="h-2 w-2 rounded-full bg-olive" /> Order overview</div>
         </div>
 
         <section aria-label="Order overview" className="mb-8 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          <article className="border border-line bg-white p-5">
+          <article className="rounded-2xl border border-line bg-white p-5">
             <div className="flex items-start justify-between"><span className="text-xs uppercase tracking-[0.1em] text-muted">All orders</span><ShoppingBag size={17} className="text-brown" /></div>
             <p className="mt-5 text-3xl font-light tracking-tight text-ink">{summary?.allOrders ?? '—'}</p>
             <p className="mt-2 text-xs text-muted">Orders recorded to date</p>
           </article>
-          <article className="border border-line bg-white p-5">
+          <article className="rounded-2xl border border-line bg-white p-5">
             <div className="flex items-start justify-between"><span className="text-xs uppercase tracking-[0.1em] text-muted">Needs attention</span><Clock3 size={17} className="text-[#98743d]" /></div>
             <p className="mt-5 text-3xl font-light tracking-tight text-ink">{summary?.needsAttention ?? '—'}</p>
             <p className="mt-2 text-xs text-muted">Pending or being prepared</p>
           </article>
-          <article className="border border-line bg-white p-5">
+          <article className="rounded-2xl border border-line bg-white p-5">
             <div className="flex items-start justify-between"><span className="text-xs uppercase tracking-[0.1em] text-muted">Paid revenue</span><CircleDollarSign size={17} className="text-olive" /></div>
             <p className="mt-5 text-3xl font-light tracking-tight text-ink">{summary ? formatPrice(summary.paidRevenue) : '—'}</p>
             <p className="mt-2 text-xs text-muted">Verified paid orders</p>
           </article>
-          <article className="border border-line bg-white p-5">
+          <article className="rounded-2xl border border-line bg-white p-5">
             <div className="flex items-start justify-between"><span className="text-xs uppercase tracking-[0.1em] text-muted">Received today</span><CalendarDays size={17} className="text-brown" /></div>
             <p className="mt-5 text-3xl font-light tracking-tight text-ink">{summary?.todayOrders ?? '—'}</p>
             <p className="mt-2 text-xs text-muted">Since the start of today</p>
           </article>
         </section>
 
-        <section className="border border-line bg-white">
+        <section className="overflow-hidden rounded-2xl border border-line bg-white">
           <div className="border-b border-line px-4 pt-4 sm:px-6">
             <div className="flex gap-5 overflow-x-auto" role="tablist" aria-label="Filter by fulfilment status">
               {statusFilters.map((filter) => {
@@ -186,7 +186,7 @@ export default function AdminOrdersPage() {
             </div>
           </div>
 
-          {error && <div role="alert" className="m-4 border border-[#e4c9c0] bg-[#fbefeb] p-4 text-sm text-clay sm:m-6"><p>{error}</p><button type="button" onClick={() => void loadOrders()} className="mt-2 font-medium underline underline-offset-4">Retry</button></div>}
+          {error && <div role="alert" className="m-4 rounded-2xl border border-[#e4c9c0] bg-[#fbefeb] p-4 text-sm text-clay sm:m-6"><p>{error}</p><button type="button" onClick={() => void loadOrders()} className="mt-2 font-medium underline underline-offset-4">Retry</button></div>}
 
           {isLoading ? (
             <div className="space-y-3 p-6" aria-label="Loading orders">{Array.from({ length: 5 }, (_, index) => <div key={index} className="h-14 animate-pulse bg-[#f5f4f1]" />)}</div>

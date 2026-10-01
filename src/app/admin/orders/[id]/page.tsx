@@ -118,7 +118,7 @@ export default function AdminOrderDetailPage() {
 
         <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1.7fr)_minmax(19rem,0.8fr)]">
           <div className="space-y-5">
-            <section className="border border-line bg-white p-5 sm:p-7">
+            <section className="rounded-2xl border border-line bg-white p-5 sm:p-7">
               <div className="mb-7 flex items-start justify-between gap-4">
                 <div><p className="text-[10px] uppercase tracking-[0.16em] text-brown">Fulfilment journey</p><h2 className="mt-2 text-xl font-medium text-ink">Order progress</h2></div>
                 {order.status === 'CANCELLED' && <StatusPill status="CANCELLED" />}
@@ -145,7 +145,7 @@ export default function AdminOrderDetailPage() {
               {canFulfil && action && <p className="mt-7 border-t border-line pt-5 text-xs text-muted">Payment verified. Continue the order through the next fulfilment step when ready.</p>}
             </section>
 
-            <section className="border border-line bg-white">
+            <section className="overflow-hidden rounded-2xl border border-line bg-white">
               <div className="flex items-center justify-between border-b border-line px-5 py-4 sm:px-7">
                 <div><p className="text-[10px] uppercase tracking-[0.16em] text-brown">Items</p><h2 className="mt-1 text-lg font-medium text-ink">In this order</h2></div>
                 <span className="text-xs text-muted">{itemCount} total</span>
@@ -173,7 +173,7 @@ export default function AdminOrderDetailPage() {
           </div>
 
           <aside className="space-y-5">
-            <section className="border border-line bg-white p-5 sm:p-6">
+            <section className="rounded-2xl border border-line bg-white p-5 sm:p-6">
               <div className="flex items-center gap-2"><CreditCard size={16} className="text-brown" /><h2 className="text-sm font-medium text-ink">Payment</h2></div>
               <div className="mt-5 flex items-center justify-between gap-3"><span className="text-xs text-muted">Payment status</span><StatusPill status={order.paymentStatus} payment /></div>
               <dl className="mt-4 space-y-3 border-t border-line pt-4 text-xs">
@@ -183,7 +183,7 @@ export default function AdminOrderDetailPage() {
               <p className="mt-4 border-t border-line pt-4 text-[11px] leading-5 text-muted">Payment state is verified by the payment provider and cannot be changed from this workspace.</p>
             </section>
 
-            <section className="border border-line bg-white p-5 sm:p-6">
+            <section className="rounded-2xl border border-line bg-white p-5 sm:p-6">
               <div className="flex items-center gap-2"><MapPin size={16} className="text-brown" /><h2 className="text-sm font-medium text-ink">Delivery</h2></div>
               <address className="mt-4 not-italic text-sm leading-6 text-ink">
                 <p className="font-medium">{order.address.firstName} {order.address.lastName}</p>
@@ -194,7 +194,7 @@ export default function AdminOrderDetailPage() {
               </address>
             </section>
 
-            <section className="border border-line bg-white p-5 sm:p-6">
+            <section className="rounded-2xl border border-line bg-white p-5 sm:p-6">
               <div className="flex items-center justify-between gap-3"><h2 className="text-sm font-medium text-ink">Customer</h2><span className="text-[10px] uppercase tracking-[0.12em] text-muted">Account</span></div>
               <p className="mt-4 text-sm font-medium text-ink">{order.user.firstName} {order.user.lastName}</p>
               <a href={`mailto:${order.user.email}`} className="mt-1 block break-all text-xs text-brown underline-offset-4 hover:underline">{order.user.email}</a>
