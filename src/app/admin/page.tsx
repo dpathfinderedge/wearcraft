@@ -1,11 +1,12 @@
 import Link from 'next/link';
-import { ArrowRight, ClipboardList, Package, ShieldCheck, Users } from 'lucide-react';
+import { ArrowRight, BarChart3, ClipboardList, Package, ShieldCheck, Users } from 'lucide-react';
 
 const areas = [
   { href: '/admin/products', label: 'Products', description: 'Manage catalogue, pricing, inventory, and imagery.', icon: Package },
   { href: '/admin/orders', label: 'Orders', description: 'Review fulfilment activity and customer orders.', icon: ClipboardList },
   { href: '/admin/reviews', label: 'Reviews', description: 'Keep customer feedback useful and trustworthy.', icon: ShieldCheck },
   { href: '/admin/users', label: 'Customers', description: 'Understand customer activity, saved addresses, and order history.', icon: Users },
+  { href: '/admin/analytics', label: 'Analytics', description: 'Track paid sales, order trends, and products customers choose.', icon: BarChart3 },
 ];
 
 export default function AdminDashboardPage() {
