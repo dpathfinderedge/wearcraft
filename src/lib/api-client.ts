@@ -147,6 +147,25 @@ export interface AdminCustomerDetail extends AdminCustomer {
   paidOrderCount: number;
 }
 
+export interface AdminAnalytics {
+  period: { days: number; start: string; end: string; previousStart: string };
+  metrics: {
+    revenue: number;
+    paidOrders: number;
+    averageOrderValue: number;
+    totalOrders: number;
+    newCustomers: number;
+    previousRevenue: number;
+    previousPaidOrders: number;
+    previousTotalOrders: number;
+    previousNewCustomers: number;
+  };
+  salesByDay: Array<{ date: string; revenue: number; orders: number }>;
+  ordersByStatus: Partial<Record<AdminOrderStatus, number>>;
+  paymentsByStatus: Partial<Record<AdminPaymentStatus, { count: number; amount: number }>>;
+  topProducts: Array<{ id: string; name: string; image: string | null; category: string; unitsSold: number }>;
+}
+
 export type AdminProductInput = Omit<AdminProduct, 'id' | 'rating' | 'reviewCount' | 'createdAt' | 'updatedAt' | '_count'>;
 
 class ApiClient {
@@ -479,6 +498,10 @@ class ApiClient {
 
   async getAdminCustomer(id: string): Promise<ApiResponse<AdminCustomerDetail>> {
     return this.request<AdminCustomerDetail>(`/api/admin/customers/${id}`);
+  }
+
+  async getAdminAnalytics(days: 7 | 30 | 90): Promise<ApiResponse<AdminAnalytics>> {
+    return this.request<AdminAnalytics>(`/api/admin/analytics?days=${days}`);
   }
 
   async getWishlist(): Promise<ApiResponse<unknown[]>> {
