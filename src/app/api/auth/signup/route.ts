@@ -3,6 +3,7 @@ import { z } from 'zod';
 import prisma from '@/lib/prisma';
 import { hashPassword, createToken, setAuthCookie } from '@/lib/auth';
 import { successResponse, errorResponse, handleApiError } from '@/lib/api-response';
+import { sendWelcomeEmail } from '@/lib/email';
 const signupSchema = z.object({
   email: z.string().email('Invalid email address'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
@@ -50,13 +51,16 @@ export async function POST(request: NextRequest) {
       email: user.email,
     });
     await setAuthCookie(token);
+    const emailResult = await sendWelcomeEmail(user);
 
     return successResponse(
       {
         user,
         token,
       },
-      'Account created successfully',
+      emailResult.sent
+        ? 'Account created successfully.'
+        : 'Account created, but the welcome email could not be sent.',
       201
     );
   } catch (error) {

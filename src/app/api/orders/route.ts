@@ -5,6 +5,7 @@ import { nanoid } from 'nanoid';
 import prisma from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 import { successResponse, errorResponse, handleApiError, parseBody } from '@/lib/api-response';
+import { sendOrderConfirmationEmail } from '@/lib/email';
 const createOrderSchema = z.object({
   items: z.array(z.object({
     productId: z.string(),
@@ -126,7 +127,27 @@ export async function POST(request: NextRequest) {
       });
     });
 
-    return successResponse(order, 'Order created successfully', 201);
+    const emailResult = await sendOrderConfirmationEmail({
+      recipient: {
+        email: authUser.email,
+        firstName: validatedData.address.firstName,
+      },
+      orderNumber: order.orderNumber,
+      createdAt: order.createdAt,
+      items: order.items,
+      subtotal: order.subtotal,
+      shipping: order.shipping,
+      tax: order.tax,
+      total: order.total,
+    });
+
+    return successResponse(
+      order,
+      emailResult.sent
+        ? 'Order created successfully.'
+        : 'Order created, but the confirmation email could not be sent. You can still view your order in your account.',
+      201
+    );
   } catch (error) {
     if (error instanceof z.ZodError) {
       return errorResponse(error.issues[0].message, 400);

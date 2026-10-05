@@ -4,6 +4,7 @@ import { z } from 'zod';
 import prisma from '@/lib/prisma';
 import { requireAdmin } from '@/lib/auth';
 import { errorResponse, handleApiError, parseBody, successResponse } from '@/lib/api-response';
+import { sendFulfilmentEmail } from '@/lib/email';
 
 const statusSchema = z.object({ status: z.nativeEnum(OrderStatus) });
 
@@ -75,6 +76,22 @@ export async function PATCH(
       return errorResponse('The order changed while you were updating it. Refresh and try again.', 409);
     }
     const order = await prisma.order.findUnique({ where: { id }, include: orderDetails });
+    if (!order) return errorResponse('Order not found', 404);
+
+    if (input.status === 'SHIPPED' || input.status === 'DELIVERED') {
+      const emailResult = await sendFulfilmentEmail(
+        { email: order.user.email, firstName: order.user.firstName },
+        order.orderNumber,
+        input.status
+      );
+      return successResponse(
+        order,
+        emailResult.sent
+          ? 'Order status updated and customer notified.'
+          : 'Order status updated, but the customer notification email could not be sent.'
+      );
+    }
+
     return successResponse(order, 'Order fulfilment status updated.');
   } catch (error) {
     if (error instanceof z.ZodError) {
