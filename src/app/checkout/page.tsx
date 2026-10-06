@@ -71,12 +71,9 @@ export default function CheckoutPage() {
     const orderResponse = await apiClient.createOrder({
       items: items.map((item) => ({
         productId: item.product.id,
-        name: item.product.name,
-        price: item.product.price,
         quantity: item.quantity,
         size: item.selectedSize,
         color: item.selectedColor,
-        image: item.product.images[0],
       })),
       address: {
         firstName: shippingAddress.firstName,
@@ -88,13 +85,7 @@ export default function CheckoutPage() {
         country: shippingAddress.country,
         phone: shippingAddress.phone,
       },
-      subtotal: summary.subtotal,
-      shipping: summary.shipping,
-      tax: summary.tax,
-      total: summary.total,
-      paymentMethod: hasValidPaystackKey ? 'paystack' : 'card',
-      paymentReference: paymentReference,
-      notes: paymentReference ? `Paystack reference: ${paymentReference}` : undefined,
+      paymentReference,
     });
 
     return orderResponse;
@@ -104,11 +95,9 @@ export default function CheckoutPage() {
     setIsProcessing(true);
 
     try {
-      const verification = await apiClient.verifyPaystackPayment(paystackResponse.reference);
-      if (!verification.success) {
-        throw new Error(verification.error || 'Payment verification failed');
+      if (paystackResponse.status !== 'success' || !paystackResponse.reference) {
+        throw new Error('PayStack did not return a successful payment reference.');
       }
-
       const orderResponse = await createOrder(paystackResponse.reference);
       if (!orderResponse.success || !orderResponse.data) {
         throw new Error(orderResponse.error || 'Order creation failed after payment');

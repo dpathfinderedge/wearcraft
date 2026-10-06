@@ -303,12 +303,9 @@ class ApiClient {
   async createOrder(data: {
     items: Array<{
       productId: string;
-      name: string;
-      price: number;
       quantity: number;
       size?: string;
       color?: string;
-      image: string;
     }>;
     address: {
       firstName: string;
@@ -320,13 +317,7 @@ class ApiClient {
       country: string;
       phone: string;
     };
-    subtotal: number;
-    shipping: number;
-    tax: number;
-    total: number;
-    paymentMethod?: string;
     paymentReference?: string;
-    notes?: string;
   }): Promise<ApiResponse<ApiOrder>> {
     return this.request<ApiOrder>('/api/orders', {
       method: 'POST',
@@ -334,8 +325,18 @@ class ApiClient {
     });
   }
 
-  async verifyPaystackPayment(reference: string): Promise<ApiResponse<{ verified: boolean; reference: string }>> {
-      return this.request<{ verified: boolean; reference: string }>('/api/paystack/verify', {
+  async verifyPaystackPayment(reference: string): Promise<ApiResponse<{
+    verified: boolean;
+    reference: string;
+    amount: number;
+    currency: string;
+  }>> {
+    return this.request<{
+      verified: boolean;
+      reference: string;
+      amount: number;
+      currency: string;
+    }>('/api/paystack/verify', {
       method: 'POST',
       body: JSON.stringify({ reference }),
     });
