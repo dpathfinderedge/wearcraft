@@ -1,6 +1,8 @@
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
+export { calculateShipping, calculateTax } from './order-pricing';
+
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -41,17 +43,6 @@ export function formatDate(date: string | Date, format: 'short' | 'long' = 'shor
 
 export function generateId(): string {
   return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-}
-
-
-export function calculateTax(subtotal: number, taxRate: number = 0.085): number {
-  return parseFloat((subtotal * taxRate).toFixed(2));
-}
-
-
-export function calculateShipping(subtotal: number, freeShippingThreshold: number = 100): number {
-  if (subtotal >= freeShippingThreshold) return 0;
-  return 10; // Flat rate shipping
 }
 
 

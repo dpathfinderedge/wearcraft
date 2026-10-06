@@ -83,7 +83,7 @@ model Order {
   total         Float
   paymentMethod String      @default("paystack")
   paymentStatus PaymentStatus @default(PENDING)
-  paymentRef    String?
+  paymentRef    String?     @unique
   notes         String?     @db.Text
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
