@@ -51,6 +51,7 @@ export default function AdminOrderDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -68,9 +69,14 @@ export default function AdminOrderDetailPage() {
     if (status === 'CANCELLED' && !window.confirm('Cancel this order? This cannot be undone.')) return;
     setIsUpdating(true);
     setError(null);
+    setNotice(null);
     const response = await apiClient.updateAdminOrderStatus(order.id, status);
-    if (response.success && response.data) setOrder(response.data);
-    else setError(response.error || 'Unable to update fulfilment status.');
+    if (response.success && response.data) {
+      setOrder(response.data);
+      setNotice(response.message || 'Order fulfilment status updated.');
+    } else {
+      setError(response.error || 'Unable to update fulfilment status.');
+    }
     setIsUpdating(false);
   };
 
@@ -114,6 +120,7 @@ export default function AdminOrderDetailPage() {
           </div>
         </header>
 
+        {notice && <div role="status" className={`mb-6 border p-4 text-sm ${notice.includes('could not be sent') ? 'border-[#e5d7b8] bg-[#fbf7eb] text-[#745f2f]' : 'border-[#d4dfd5] bg-[#f0f5f0] text-[#49634e]'}`}>{notice}</div>}
         {error && <div role="alert" className="mb-6 border border-[#e4c9c0] bg-[#fbefeb] p-4 text-sm text-clay">{error}</div>}
 
         <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1.7fr)_minmax(19rem,0.8fr)]">

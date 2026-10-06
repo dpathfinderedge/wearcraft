@@ -13,11 +13,11 @@ interface AuthStore {
   isLoading: boolean;
   error: string | null;
   login: (credentials: AuthCredentials) => Promise<{ success: boolean; error?: string }>;
-  signup: (data: SignupData) => Promise<{ success: boolean; error?: string }>;
+  signup: (data: SignupData) => Promise<{ success: boolean; error?: string; message?: string }>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
   loadAddresses: () => Promise<{ success: boolean; error?: string } | void>;
-  updateProfile: (profile: UpdateProfileData) => Promise<{ success: boolean; error?: string }>;
+  updateProfile: (profile: UpdateProfileData) => Promise<{ success: boolean; error?: string; message?: string }>;
   updateUser: (userData: Partial<User>) => void;
   clearError: () => void;
   addAddress: (address: Omit<Address, 'id'> & { isDefault?: boolean }) => Promise<{ success: boolean; error?: string }>;
@@ -99,7 +99,7 @@ export const useAuthStore = create<AuthStore>()(
               isLoading: false,
             });
 
-            return { success: true };
+            return { success: true, message: response.message };
           }
 
           set({ isLoading: false, error: response.error || 'Signup failed' });
@@ -205,7 +205,7 @@ export const useAuthStore = create<AuthStore>()(
             const mappedUser = mapUserFromApi(user);
 
             set({ user: mappedUser, isLoading: false });
-            return { success: true };
+            return { success: true, message: response.message };
           }
 
           set({ isLoading: false, error: response.error || 'Failed to update profile' });

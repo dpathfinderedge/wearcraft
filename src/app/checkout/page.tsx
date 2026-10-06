@@ -114,6 +114,9 @@ export default function CheckoutPage() {
         throw new Error(orderResponse.error || 'Order creation failed after payment');
       }
 
+      if (orderResponse.message?.includes('could not be sent')) {
+        showToast(orderResponse.message, 'warning');
+      }
       clearCart();
       router.push(`/order-confirmation?orderId=${orderResponse.data.id}`);
     } catch (error) {
@@ -163,6 +166,9 @@ export default function CheckoutPage() {
         return;
       }
 
+      if (orderResponse.message?.includes('could not be sent')) {
+        showToast(orderResponse.message, 'warning');
+      }
       clearCart();
       router.push(`/order-confirmation?orderId=${orderResponse.data.id}`);
     }

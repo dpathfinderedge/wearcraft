@@ -105,7 +105,8 @@ export default function ProfilePage() {
   const onSubmitProfile = async (data: ProfileInput) => {
     const result = await updateProfile(data);
     if (result.success) {
-      showToast('Profile updated successfully', 'success');
+      const message = result.message || 'Profile updated successfully';
+      showToast(message, message.includes('could not be sent') ? 'warning' : 'success');
     } else {
       showToast(result.error || 'Unable to update profile', 'error');
     }

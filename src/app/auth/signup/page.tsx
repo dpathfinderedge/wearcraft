@@ -30,7 +30,8 @@ export default function SignupPage() {
     setIsLoading(false);
 
     if (result.success) {
-      showToast('Account created successfully!', 'success');
+      const message = result.message || 'Account created successfully!';
+      showToast(message, message.includes('could not be sent') ? 'warning' : 'success');
       router.push('/');
     } else {
       showToast(result.error || 'Signup failed', 'error');
