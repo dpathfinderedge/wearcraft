@@ -167,6 +167,7 @@ The storefront will be redesigned into a more modern, distinctive, and aesthetic
 - Storefront product and cart imagery use `next/image`; no raw `<img>` elements remain under `src/`.
 - No source comments remain in `src/` or `prisma/`.
 - No test-account credentials or development-only test-route references remain.
+- `npm test` passes with eight focused tests covering PayStack response verification, failure cases, and order payment matching.
 - PayStack hardening changes passed TypeScript, focused ESLint, and Prisma schema validation.
 - Verified there were no duplicate payment references before adding the database unique constraint; applied the constraint to the configured local database.
 - Prisma Client regeneration reported a Windows file-lock (`EPERM`) while the development server was using the generated engine.
@@ -176,8 +177,7 @@ The storefront will be redesigned into a more modern, distinctive, and aesthetic
 
 ### Immediate correctness and validation
 
-- Execute a PayStack test transaction using valid test credentials.
-- Exercise invalid references, mismatched payment amount/customer, and repeated signed webhook delivery against PayStack test mode.
+- Run a PayStack test-mode checkout with valid test credentials and exercise invalid references, mismatched amount/customer, and repeated signed webhook delivery; the automated tests currently mock provider responses.
 - Confirm production environment variables and webhook URL configuration.
 - Apply the payment-reference unique constraint to production before deploying the application changes.
 
