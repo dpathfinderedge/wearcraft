@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 const paystackTransactionSchema = z.object({
-  status: z.literal('success'),
+  status: z.literal(true),
   message: z.string().optional(),
   data: z.object({
     reference: z.string().min(1),
