@@ -68,7 +68,7 @@ test('verifies a successful transaction using the encoded reference and secret k
       );
       assert.equal(new Headers(init?.headers).get('Authorization'), 'Bearer test_secret_key');
       return jsonResponse({
-        status: 'success',
+        status: true,
         data: { ...transaction, reference: 'payment/reference' },
       });
     },
@@ -132,11 +132,26 @@ test('rejects invalid provider response bodies', async () => {
   );
 });
 
+test('rejects provider responses without a successful top-level status', async () => {
+  await withPaystackMocks(
+    'test_secret_key',
+    async () => jsonResponse({
+      status: false,
+      message: 'Verification failed',
+      data: transaction,
+    }),
+    () => expectVerificationError(
+      () => verifyPaystackTransaction(transaction.reference),
+      502
+    )
+  );
+});
+
 test('rejects transactions that have not succeeded', async () => {
   await withPaystackMocks(
     'test_secret_key',
     async () => jsonResponse({
-      status: 'success',
+      status: true,
       data: { ...transaction, status: 'failed' },
     }),
     () => expectVerificationError(
@@ -150,7 +165,7 @@ test('rejects a provider response for a different payment reference', async () =
   await withPaystackMocks(
     'test_secret_key',
     async () => jsonResponse({
-      status: 'success',
+      status: true,
       data: { ...transaction, reference: 'different-reference' },
     }),
     () => expectVerificationError(
