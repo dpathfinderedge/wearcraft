@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test": "tsx --test src/lib/paystack-server.test.ts",
+    "test": "tsx --test src/lib/paystack-server.test.ts src/lib/paystack-webhook.test.ts",
     "lint": "eslint",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
