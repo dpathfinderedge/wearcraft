@@ -4,6 +4,7 @@ import prisma from '@/lib/prisma';
 import { hashPassword, createToken, setAuthCookie } from '@/lib/auth';
 import { successResponse, errorResponse, handleApiError } from '@/lib/api-response';
 import { sendWelcomeEmail } from '@/lib/email';
+import { getJwtSecret } from '@/lib/jwt-secret';
 const signupSchema = z.object({
   email: z.string().email('Invalid email address'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
@@ -21,6 +22,7 @@ export async function POST(request: NextRequest) {
       return errorResponse('Invalid JSON in request body', 400);
     }
     const validatedData = signupSchema.parse(body);
+    getJwtSecret();
     const existingUser = await prisma.user.findUnique({
       where: { email: validatedData.email },
     });

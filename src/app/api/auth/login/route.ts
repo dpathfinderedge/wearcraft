@@ -3,6 +3,7 @@ import { z } from 'zod';
 import prisma from '@/lib/prisma';
 import { verifyPassword, createToken, setAuthCookie } from '@/lib/auth';
 import { successResponse, errorResponse, handleApiError } from '@/lib/api-response';
+import { getJwtSecret } from '@/lib/jwt-secret';
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
   password: z.string().min(1, 'Password is required'),
@@ -17,6 +18,7 @@ export async function POST(request: NextRequest) {
       return errorResponse('Invalid JSON in request body', 400);
     }
     const validatedData = loginSchema.parse(body);
+    getJwtSecret();
     const user = await prisma.user.findUnique({
       where: { email: validatedData.email },
       include: {
