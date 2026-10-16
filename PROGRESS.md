@@ -143,6 +143,7 @@ WearCraft is a Next.js fashion e-commerce application with authenticated account
 - Support both API price-sort names and the storefront's low-to-high/high-to-low sort values.
 - Validate product review lookup and submission values, rejecting duplicate or unknown lookup filters.
 - Return a client error for malformed multipart upload requests rather than treating request parsing failures as server errors.
+- Keep product rating/count aggregates limited to published reviews, matching the public product review feed.
 
 ### Storefront data consistency
 
@@ -177,7 +178,7 @@ The storefront will be redesigned into a more modern, distinctive, and aesthetic
 - Storefront product and cart imagery use `next/image`; no raw `<img>` elements remain under `src/`.
 - No source comments remain in `src/` or `prisma/`.
 - No test-account credentials or development-only test-route references remain.
-- `npm test` passes 48 checks covering account validation, API error responses, product and review validation, PayStack verification and webhooks, JWT secret validation, and wishlist request validation.
+- `npm test` passes 49 checks covering account validation, API error responses, product and review validation, PayStack verification and webhooks, JWT secret validation, and wishlist request validation.
 - Completed a PayStack test-mode checkout; verified the provider transaction, created one paid order, confirmed repeated signed webhook delivery is idempotent, and confirmed a mismatched amount is rejected.
 - PayStack hardening changes passed TypeScript, focused ESLint, and Prisma schema validation.
 - Verified there were no duplicate payment references before adding the database unique constraint; applied the constraint to the configured local database.

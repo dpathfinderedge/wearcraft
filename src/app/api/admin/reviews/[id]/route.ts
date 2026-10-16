@@ -3,12 +3,13 @@ import { z } from 'zod';
 import prisma from '@/lib/prisma';
 import { requireAdmin } from '@/lib/auth';
 import { errorResponse, handleApiError, parseBody, successResponse } from '@/lib/api-response';
+import { publishedProductReviewsWhere } from '@/lib/review-validation';
 
 const moderationSchema = z.object({ published: z.boolean() });
 
 async function refreshProductRating(productId: string) {
   const aggregate = await prisma.review.aggregate({
-    where: { productId, published: true },
+    where: publishedProductReviewsWhere(productId),
     _avg: { rating: true },
     _count: { _all: true },
   });

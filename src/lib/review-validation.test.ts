@@ -1,6 +1,17 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { reviewInputSchema, reviewLookupQuerySchema } from './review-validation';
+import {
+  publishedProductReviewsWhere,
+  reviewInputSchema,
+  reviewLookupQuerySchema,
+} from './review-validation';
+
+test('scopes product review aggregates to published reviews', () => {
+  assert.deepEqual(publishedProductReviewsWhere('product-1'), {
+    productId: 'product-1',
+    published: true,
+  });
+});
 
 test('validates and normalizes optional product review lookup names', () => {
   assert.deepEqual(reviewLookupQuerySchema.parse({}), {});
