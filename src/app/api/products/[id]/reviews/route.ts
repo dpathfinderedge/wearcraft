@@ -3,13 +3,7 @@ import { z } from 'zod';
 import prisma from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 import { errorResponse, handleApiError, parseBody, successResponse } from '@/lib/api-response';
-
-const reviewInputSchema = z.object({
-  productName: z.string().min(1).optional(),
-  rating: z.number().int().min(1).max(5),
-  title: z.string().trim().min(5).max(100),
-  comment: z.string().trim().min(20).max(2000),
-});
+import { reviewInputSchema, reviewLookupQuerySchema } from '@/lib/review-validation';
 
 async function findProduct(id: string, productName?: string) {
   return prisma.product.findFirst({
@@ -30,7 +24,20 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const productName = request.nextUrl.searchParams.get('name') || undefined;
+    const searchParams = request.nextUrl.searchParams;
+    if (searchParams.getAll('name').length > 1) {
+      return errorResponse('The product name filter must be provided only once.', 400);
+    }
+    const parsedQuery = reviewLookupQuerySchema.safeParse(
+      Object.fromEntries(searchParams)
+    );
+    if (!parsedQuery.success) {
+      return errorResponse(
+        parsedQuery.error.issues[0]?.message || 'Invalid review filters.',
+        400
+      );
+    }
+    const productName = parsedQuery.data.name;
     const product = await findProduct(id, productName);
 
     if (!product) {
