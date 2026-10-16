@@ -167,8 +167,7 @@ The storefront will be redesigned into a more modern, distinctive, and aesthetic
 - Storefront product and cart imagery use `next/image`; no raw `<img>` elements remain under `src/`.
 - No source comments remain in `src/` or `prisma/`.
 - No test-account credentials or development-only test-route references remain.
-- `npm test` covers PayStack verification and webhook checks, JWT secret validation, and wishlist request validation.
-- The current source files report no editor diagnostics; full and focused Node test commands stalled before completing during this work session.
+- `npm test` passes 37 checks covering API error responses, PayStack verification and webhooks, JWT secret validation, and wishlist request validation.
 - Completed a PayStack test-mode checkout; verified the provider transaction, created one paid order, confirmed repeated signed webhook delivery is idempotent, and confirmed a mismatched amount is rejected.
 - PayStack hardening changes passed TypeScript, focused ESLint, and Prisma schema validation.
 - Verified there were no duplicate payment references before adding the database unique constraint; applied the constraint to the configured local database.
@@ -190,6 +189,7 @@ The storefront will be redesigned into a more modern, distinctive, and aesthetic
 
 - Reject JWT signing and verification when `JWT_SECRET` is missing or shorter than 32 UTF-8 bytes; the local example documents this requirement.
 - Validate wishlist creation payloads, return actionable errors for malformed JSON, and resolve by product ID when one is supplied.
+- Convert malformed JSON from shared `parseBody` requests to a consistent HTTP 400 response without logging expected client input errors as server failures.
 - Add authorization and ownership checks across all profile, address, order, review, wishlist, and admin operations.
 - Add request validation and consistent error handling to any remaining untyped endpoints.
 - Review responsive and accessibility behavior across the complete shopping flow.
