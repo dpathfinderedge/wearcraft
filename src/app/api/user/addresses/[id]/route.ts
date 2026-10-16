@@ -3,20 +3,7 @@ import { z } from 'zod';
 import prisma from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 import { successResponse, errorResponse, handleApiError, parseBody } from '@/lib/api-response';
-
-const addressUpdateSchema = z.object({
-  firstName: z.string().min(1, 'First name is required').optional(),
-  lastName: z.string().min(1, 'Last name is required').optional(),
-  address: z.string().min(5, 'Address is required').optional(),
-  city: z.string().min(2, 'City is required').optional(),
-  state: z.string().min(2, 'State is required').optional(),
-  zipCode: z.string().min(3, 'Postal code is required').optional(),
-  country: z.string().min(2, 'Country is required').optional(),
-  phone: z.string().min(7, 'Phone number is required').optional(),
-  isDefault: z.boolean().optional(),
-});
-
-type AddressUpdateInput = z.infer<typeof addressUpdateSchema>;
+import { addressUpdateSchema } from '@/lib/account-validation';
 
 export async function PUT(
   request: NextRequest,
@@ -24,28 +11,23 @@ export async function PUT(
 ) {
   try {
     const authUser = await requireAuth(request);
-    const body = await parseBody<AddressUpdateInput>(request);
+    const body = await parseBody<unknown>(request);
     const validatedData = addressUpdateSchema.parse(body);
     const { id } = await params;
 
-    const address = await prisma.address.findFirst({
-      where: { id, userId: authUser.userId },
-    });
-
-    if (!address) {
-      return errorResponse('Address not found', 404);
-    }
-
-    if (validatedData.isDefault) {
-      await prisma.address.updateMany({
-        where: { userId: authUser.userId },
-        data: { isDefault: false },
+    const updatedAddress = await prisma.$transaction(async (transaction) => {
+      const address = await transaction.address.findFirst({
+        where: { id, userId: authUser.userId },
       });
-    }
+      if (!address) return null;
 
-    const updatedAddress = await prisma.address.update({
-      where: { id },
-      data: {
+      const nextAddress = address.isDefault && validatedData.isDefault === false
+        ? await transaction.address.findFirst({
+          where: { userId: authUser.userId, id: { not: id } },
+          orderBy: { createdAt: 'asc' },
+        })
+        : null;
+      const data = {
         firstName: validatedData.firstName ?? address.firstName,
         lastName: validatedData.lastName ?? address.lastName,
         address: validatedData.address ?? address.address,
@@ -54,14 +36,39 @@ export async function PUT(
         zipCode: validatedData.zipCode ?? address.zipCode,
         country: validatedData.country ?? address.country,
         phone: validatedData.phone ?? address.phone,
-        isDefault: validatedData.isDefault ?? address.isDefault,
-      },
-    });
-    if (validatedData.isDefault && !address.isDefault) {
-      await prisma.address.updateMany({
-        where: { userId: authUser.userId, id: { not: id } },
-        data: { isDefault: false },
+        isDefault: address.isDefault
+          && validatedData.isDefault === false
+          && !nextAddress
+          ? true
+          : validatedData.isDefault ?? address.isDefault,
+      };
+
+      if (validatedData.isDefault === true) {
+        await transaction.address.updateMany({
+          where: { userId: authUser.userId },
+          data: { isDefault: false },
+        });
+      }
+
+      const updated = await transaction.address.update({
+        where: { id },
+        data,
       });
+
+      if (address.isDefault && validatedData.isDefault === false) {
+        if (nextAddress) {
+          await transaction.address.updateMany({
+            where: { id: nextAddress.id, userId: authUser.userId },
+            data: { isDefault: true },
+          });
+        }
+      }
+
+      return updated;
+    });
+
+    if (!updatedAddress) {
+      return errorResponse('Address not found', 404);
     }
 
     return successResponse(updatedAddress, 'Address updated successfully');
@@ -81,28 +88,31 @@ export async function DELETE(
     const authUser = await requireAuth(request);
     const { id } = await params;
 
-    const address = await prisma.address.findFirst({
-      where: { id, userId: authUser.userId },
+    const deleted = await prisma.$transaction(async (transaction) => {
+      const address = await transaction.address.findFirst({
+        where: { id, userId: authUser.userId },
+      });
+      if (!address) return false;
+
+      await transaction.address.delete({ where: { id } });
+
+      if (address.isDefault) {
+        const nextAddress = await transaction.address.findFirst({
+          where: { userId: authUser.userId },
+          orderBy: { createdAt: 'asc' },
+        });
+        if (nextAddress) {
+          await transaction.address.updateMany({
+            where: { id: nextAddress.id, userId: authUser.userId },
+            data: { isDefault: true },
+          });
+        }
+      }
+      return true;
     });
 
-    if (!address) {
+    if (!deleted) {
       return errorResponse('Address not found', 404);
-    }
-
-    await prisma.address.delete({ where: { id } });
-
-    if (address.isDefault) {
-      const nextAddress = await prisma.address.findFirst({
-        where: { userId: authUser.userId },
-        orderBy: { createdAt: 'asc' },
-      });
-
-      if (nextAddress) {
-        await prisma.address.update({
-          where: { id: nextAddress.id },
-          data: { isDefault: true },
-        });
-      }
     }
 
     return successResponse(null, 'Address deleted successfully');

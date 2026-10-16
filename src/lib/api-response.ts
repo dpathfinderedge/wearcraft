@@ -7,6 +7,12 @@ export interface ApiResponse<T = unknown> {
   error?: string;
   message?: string;
 }
+export class InvalidRequestBodyError extends Error {
+  constructor() {
+    super('Invalid JSON in request body');
+    this.name = 'InvalidRequestBodyError';
+  }
+}
 export function successResponse<T>(
   data: T,
   message?: string,
@@ -34,8 +40,11 @@ export function errorResponse(
   );
 }
 export function handleApiError(error: unknown): NextResponse<ApiResponse> {
-  console.error('API Error:', error);
+  if (error instanceof InvalidRequestBodyError) {
+    return errorResponse(error.message, 400);
+  }
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    console.error('API Error:', error);
     switch (error.code) {
       case 'P2002':
         return errorResponse('A record with this value already exists', 409);
@@ -50,19 +59,24 @@ export function handleApiError(error: unknown): NextResponse<ApiResponse> {
     }
   }
   if (error instanceof Prisma.PrismaClientValidationError) {
+    console.error('API Error:', error);
     return errorResponse('Invalid data provided', 400);
   }
   if (error instanceof Error) {
     if (error.message === 'Unauthorized') {
+      console.error('API Error:', error);
       return errorResponse('Unauthorized. Please login.', 401);
     }
     if (error.message === 'Forbidden') {
+      console.error('API Error:', error);
       return errorResponse('You do not have permission to perform this action.', 403);
     }
 
     if (error.message.includes('not found')) {
+      console.error('API Error:', error);
       return errorResponse('Resource not found', 404);
     }
+    console.error('API Error:', error);
     return errorResponse(
       process.env.NODE_ENV === 'development'
         ? error.message
@@ -70,6 +84,7 @@ export function handleApiError(error: unknown): NextResponse<ApiResponse> {
       500
     );
   }
+  console.error('API Error:', error);
   return errorResponse('An unexpected error occurred', 500);
 }
 export async function parseBody<T>(request: Request): Promise<T> {
@@ -77,7 +92,7 @@ export async function parseBody<T>(request: Request): Promise<T> {
     const body = await request.json();
     return body as T;
   } catch {
-    throw new Error('Invalid request body');
+    throw new InvalidRequestBodyError();
   }
 }
 export function corsHeaders() {

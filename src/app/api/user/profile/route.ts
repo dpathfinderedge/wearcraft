@@ -4,12 +4,7 @@ import prisma from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 import { successResponse, errorResponse, handleApiError, parseBody } from '@/lib/api-response';
 import { sendAccountUpdateEmail } from '@/lib/email';
-
-const profileUpdateSchema = z.object({
-  firstName: z.string().min(1, 'First name is required'),
-  lastName: z.string().min(1, 'Last name is required'),
-  phone: z.string().optional(),
-});
+import { profileUpdateSchema } from '@/lib/account-validation';
 
 export type ProfileUpdateInput = z.infer<typeof profileUpdateSchema>;
 
