@@ -1,7 +1,9 @@
 import { NextRequest } from 'next/server';
+import { z } from 'zod';
 import prisma from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 import { errorResponse, handleApiError, successResponse } from '@/lib/api-response';
+import { wishlistRequestSchema } from '@/lib/wishlist-input';
 
 export async function GET(request: NextRequest) {
   try {
@@ -21,19 +23,18 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const user = await requireAuth(request);
-    const body = await request.json() as { productId?: string; productName?: string };
-
-    if (!body.productId && !body.productName) {
-      return errorResponse('A product is required', 400);
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return errorResponse('Invalid JSON in request body', 400);
     }
 
+    const validatedData = wishlistRequestSchema.parse(body);
     const product = await prisma.product.findFirst({
-      where: {
-        OR: [
-          body.productId ? { id: body.productId } : undefined,
-          body.productName ? { name: body.productName } : undefined,
-        ].filter((value): value is { id: string } | { name: string } => Boolean(value)),
-      },
+      where: validatedData.productId
+        ? { id: validatedData.productId }
+        : { name: validatedData.productName },
       select: { id: true },
     });
 
@@ -51,6 +52,9 @@ export async function POST(request: NextRequest) {
 
     return successResponse(wishlistItem, 'Added to wishlist', 201);
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      return errorResponse(error.issues[0]?.message || 'Invalid wishlist request.', 400);
+    }
     return handleApiError(error);
   }
 }

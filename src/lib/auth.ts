@@ -3,9 +3,7 @@ import { cookies } from 'next/headers';
 import { NextRequest } from 'next/server';
 import bcrypt from 'bcryptjs';
 import prisma from '@/lib/prisma';
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || 'your-super-secret-jwt-key'
-);
+import { getJwtSecret } from '@/lib/jwt-secret';
 const TOKEN_NAME = 'wearcraft-token';
 const TOKEN_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
 
@@ -28,13 +26,14 @@ export async function createToken(payload: JWTPayload): Promise<string> {
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime('7d')
-    .sign(JWT_SECRET);
+    .sign(getJwtSecret());
 
   return token;
 }
 export async function verifyToken(token: string): Promise<JWTPayload | null> {
+  const secret = getJwtSecret();
   try {
-    const { payload } = await jwtVerify(token, JWT_SECRET);
+    const { payload } = await jwtVerify(token, secret);
     return payload as JWTPayload;
   } catch (error) {
     console.error('Token verification failed:', error);
@@ -59,22 +58,17 @@ export async function removeAuthCookie(): Promise<void> {
 export async function getCurrentUser(
   request?: NextRequest
 ): Promise<JWTPayload | null> {
-  try {
-    let token: string | undefined;
+  let token: string | undefined;
 
-    if (request) {
-      token = request.cookies.get(TOKEN_NAME)?.value;
-    } else {
-      token = await getAuthCookie();
-    }
-
-    if (!token) return null;
-
-    return await verifyToken(token);
-  } catch (error) {
-    console.error('Get current user failed:', error);
-    return null;
+  if (request) {
+    token = request.cookies.get(TOKEN_NAME)?.value;
+  } else {
+    token = await getAuthCookie();
   }
+
+  if (!token) return null;
+
+  return await verifyToken(token);
 }
 export async function requireAuth(
   request: NextRequest

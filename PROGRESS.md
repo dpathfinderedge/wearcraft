@@ -167,7 +167,8 @@ The storefront will be redesigned into a more modern, distinctive, and aesthetic
 - Storefront product and cart imagery use `next/image`; no raw `<img>` elements remain under `src/`.
 - No source comments remain in `src/` or `prisma/`.
 - No test-account credentials or development-only test-route references remain.
-- `npm test` passes with 27 PayStack verification and webhook checks, including invalid signatures and payloads, mismatched amount/currency/customer, retryable missing orders, and idempotent repeated delivery.
+- `npm test` covers PayStack verification and webhook checks, JWT secret validation, and wishlist request validation.
+- The current source files report no editor diagnostics; full and focused Node test commands stalled before completing during this work session.
 - Completed a PayStack test-mode checkout; verified the provider transaction, created one paid order, confirmed repeated signed webhook delivery is idempotent, and confirmed a mismatched amount is rejected.
 - PayStack hardening changes passed TypeScript, focused ESLint, and Prisma schema validation.
 - Verified there were no duplicate payment references before adding the database unique constraint; applied the constraint to the configured local database.
@@ -178,7 +179,7 @@ The storefront will be redesigned into a more modern, distinctive, and aesthetic
 
 ### Immediate correctness and validation
 
-- Confirm production environment variables and webhook URL configuration.
+- Production settings are not available in this workspace: local PayStack keys are test-mode, the app URL is localhost, and both configured databases are local. Confirm live credentials, public app URL, and webhook endpoint in the hosting environment before deployment.
 - Apply the payment-reference unique constraint to production before deploying the application changes.
 
 ### Product features
@@ -187,6 +188,8 @@ The storefront will be redesigned into a more modern, distinctive, and aesthetic
 
 ### Production hardening
 
+- Reject JWT signing and verification when `JWT_SECRET` is missing or shorter than 32 UTF-8 bytes; the local example documents this requirement.
+- Validate wishlist creation payloads, return actionable errors for malformed JSON, and resolve by product ID when one is supplied.
 - Add authorization and ownership checks across all profile, address, order, review, wishlist, and admin operations.
 - Add request validation and consistent error handling to any remaining untyped endpoints.
 - Review responsive and accessibility behavior across the complete shopping flow.
