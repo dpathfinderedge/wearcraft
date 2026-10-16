@@ -13,6 +13,12 @@ export class InvalidRequestBodyError extends Error {
     this.name = 'InvalidRequestBodyError';
   }
 }
+export class InvalidMultipartFormDataError extends Error {
+  constructor() {
+    super('Invalid multipart form data');
+    this.name = 'InvalidMultipartFormDataError';
+  }
+}
 export function successResponse<T>(
   data: T,
   message?: string,
@@ -40,7 +46,7 @@ export function errorResponse(
   );
 }
 export function handleApiError(error: unknown): NextResponse<ApiResponse> {
-  if (error instanceof InvalidRequestBodyError) {
+  if (error instanceof InvalidRequestBodyError || error instanceof InvalidMultipartFormDataError) {
     return errorResponse(error.message, 400);
   }
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
@@ -93,6 +99,21 @@ export async function parseBody<T>(request: Request): Promise<T> {
     return body as T;
   } catch {
     throw new InvalidRequestBodyError();
+  }
+}
+export async function parseFormData(request: Request): Promise<FormData> {
+  const contentType = request.headers.get('content-type') || '';
+  if (
+    !/^multipart\/form-data\s*;/i.test(contentType)
+    || !/\bboundary=(?:"[^"]+"|[^;\s]+)/i.test(contentType)
+  ) {
+    throw new InvalidMultipartFormDataError();
+  }
+
+  try {
+    return await request.formData();
+  } catch {
+    throw new InvalidMultipartFormDataError();
   }
 }
 export function corsHeaders() {

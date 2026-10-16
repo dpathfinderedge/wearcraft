@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import { v2 as cloudinary } from 'cloudinary';
 import { requireAdmin } from '@/lib/auth';
-import { errorResponse, handleApiError, successResponse } from '@/lib/api-response';
+import { errorResponse, handleApiError, parseFormData, successResponse } from '@/lib/api-response';
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -31,7 +31,7 @@ function uploadBuffer(buffer: Buffer): Promise<{ url: string; publicId: string }
 export async function POST(request: NextRequest) {
   try {
     await requireAdmin(request);
-    const formData = await request.formData();
+    const formData = await parseFormData(request);
     const entries = formData.getAll('files');
     if (entries.length === 0 || entries.some((entry) => !(entry instanceof File))) {
       return errorResponse('Select at least one image file.', 400);
