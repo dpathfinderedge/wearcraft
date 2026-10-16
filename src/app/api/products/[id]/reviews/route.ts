@@ -3,7 +3,11 @@ import { z } from 'zod';
 import prisma from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 import { errorResponse, handleApiError, parseBody, successResponse } from '@/lib/api-response';
-import { reviewInputSchema, reviewLookupQuerySchema } from '@/lib/review-validation';
+import {
+  publishedProductReviewsWhere,
+  reviewInputSchema,
+  reviewLookupQuerySchema,
+} from '@/lib/review-validation';
 
 async function findProduct(id: string, productName?: string) {
   return prisma.product.findFirst({
@@ -45,7 +49,7 @@ export async function GET(
     }
 
     const reviews = await prisma.review.findMany({
-      where: { productId: product.id, published: true },
+      where: publishedProductReviewsWhere(product.id),
       select: {
         id: true,
         rating: true,
@@ -143,7 +147,7 @@ export async function POST(
       });
 
       const aggregate = await transaction.review.aggregate({
-        where: { productId: product.id },
+        where: publishedProductReviewsWhere(product.id),
         _avg: { rating: true },
         _count: { _all: true },
       });
