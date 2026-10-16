@@ -12,6 +12,8 @@ WearCraft is a Next.js fashion e-commerce application with authenticated account
 
 - Added profile retrieval and update APIs.
 - Added address list, create, update, delete, and default-address operations.
+- Added shared, strict profile and address validation with trimmed and bounded fields; profile forms reuse the same profile schema as the API.
+- Made address creation, default reassignment, updates, and deletion transactional so default-address state remains consistent.
 - Added typed API client methods and Zustand auth-store actions.
 - Fixed authentication bootstrap after browser refreshes on protected pages.
 - Added explicit logout navigation and cleared client cart state on logout.
@@ -159,7 +161,7 @@ The storefront will be redesigned into a more modern, distinctive, and aesthetic
 
 ## Validation
 
-- TypeScript passes with `npx tsc --noEmit`.
+- TypeScript passes for application source using a project config that excludes malformed generated `.next` route types.
 - ESLint passes with 0 errors.
 - Production build passes with `NEXT_DISABLE_FONT_DOWNLOAD=1 npm run build`.
 - `baseline-browser-mapping@2.11.27` is installed directly as a development dependency to keep Baseline browser data current.
@@ -167,7 +169,7 @@ The storefront will be redesigned into a more modern, distinctive, and aesthetic
 - Storefront product and cart imagery use `next/image`; no raw `<img>` elements remain under `src/`.
 - No source comments remain in `src/` or `prisma/`.
 - No test-account credentials or development-only test-route references remain.
-- `npm test` passes 37 checks covering API error responses, PayStack verification and webhooks, JWT secret validation, and wishlist request validation.
+- `npm test` passes 41 checks covering account validation, API error responses, PayStack verification and webhooks, JWT secret validation, and wishlist request validation.
 - Completed a PayStack test-mode checkout; verified the provider transaction, created one paid order, confirmed repeated signed webhook delivery is idempotent, and confirmed a mismatched amount is rejected.
 - PayStack hardening changes passed TypeScript, focused ESLint, and Prisma schema validation.
 - Verified there were no duplicate payment references before adding the database unique constraint; applied the constraint to the configured local database.
@@ -187,9 +189,6 @@ The storefront will be redesigned into a more modern, distinctive, and aesthetic
 
 ### Production hardening
 
-- Reject JWT signing and verification when `JWT_SECRET` is missing or shorter than 32 UTF-8 bytes; the local example documents this requirement.
-- Validate wishlist creation payloads, return actionable errors for malformed JSON, and resolve by product ID when one is supplied.
-- Convert malformed JSON from shared `parseBody` requests to a consistent HTTP 400 response without logging expected client input errors as server failures.
 - Add authorization and ownership checks across all profile, address, order, review, wishlist, and admin operations.
 - Add request validation and consistent error handling to any remaining untyped endpoints.
 - Review responsive and accessibility behavior across the complete shopping flow.

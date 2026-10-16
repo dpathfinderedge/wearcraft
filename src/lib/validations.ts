@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { profileUpdateSchema } from './account-validation';
 
 
 export const loginSchema = z.object({
@@ -19,14 +20,14 @@ export const signupSchema = z.object({
 
 
 export const addressSchema = z.object({
-  firstName: z.string().min(2, 'First name must be at least 2 characters'),
-  lastName: z.string().min(2, 'Last name must be at least 2 characters'),
-  street: z.string().min(5, 'Street address is required'),
-  city: z.string().min(2, 'City is required'),
-  state: z.string().min(2, 'State is required'),
-  postalCode: z.string().min(4, 'Postal code is required'),
-  country: z.string().min(2, 'Country is required'),
-  phone: z.string().min(10, 'Please enter a valid phone number'),
+  firstName: z.string().trim().min(2, 'First name must be at least 2 characters').max(100),
+  lastName: z.string().trim().min(2, 'Last name must be at least 2 characters').max(100),
+  street: z.string().trim().min(5, 'Street address is required').max(300),
+  city: z.string().trim().min(2, 'City is required').max(100),
+  state: z.string().trim().min(2, 'State is required').max(100),
+  postalCode: z.string().trim().min(3, 'Postal code is required').max(30),
+  country: z.string().trim().min(2, 'Country is required').max(100),
+  phone: z.string().trim().min(7, 'Please enter a valid phone number').max(40),
   isDefault: z.boolean().optional(),
 });
 
@@ -38,11 +39,7 @@ export const checkoutSchema = z.object({
 });
 
 
-export const profileSchema = z.object({
-  firstName: z.string().min(2, 'First name is required'),
-  lastName: z.string().min(2, 'Last name is required'),
-  phone: z.string().optional(),
-});
+export const profileSchema = profileUpdateSchema;
 
 
 export const reviewSchema = z.object({
