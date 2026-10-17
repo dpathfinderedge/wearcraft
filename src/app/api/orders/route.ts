@@ -12,26 +12,7 @@ import {
   PaystackVerificationError,
   verifyPaystackTransaction,
 } from '@/lib/paystack-server';
-
-const createOrderSchema = z.object({
-  items: z.array(z.object({
-    productId: z.string().trim().min(1),
-    quantity: z.number().int().min(1).max(20),
-    size: z.string().trim().max(80).optional(),
-    color: z.string().trim().max(80).optional(),
-  })).min(1).max(50),
-  address: z.object({
-    firstName: z.string().trim().min(1).max(100),
-    lastName: z.string().trim().min(1).max(100),
-    address: z.string().trim().min(1).max(300),
-    city: z.string().trim().min(1).max(100),
-    state: z.string().trim().min(1).max(100),
-    zipCode: z.string().trim().min(1).max(30),
-    country: z.string().trim().min(1).max(100),
-    phone: z.string().trim().min(1).max(40),
-  }),
-  paymentReference: z.string().trim().min(1).max(100).optional(),
-});
+import { createOrderSchema, getRequestedQuantityByProduct } from '@/lib/order-validation';
 
 class OrderValidationError extends Error {
   constructor(message: string) {
@@ -91,19 +72,18 @@ export async function POST(request: NextRequest) {
       return errorResponse('User not found', 404);
     }
 
-    if (validatedData.paymentReference) {
-      const existingOrder = await prisma.order.findFirst({
-        where: { paymentRef: validatedData.paymentReference },
-        include: { items: true, address: true },
-      });
-      if (existingOrder) {
-        if (existingOrder.userId !== authUser.userId) {
-          return errorResponse('This payment reference is already associated with another order.', 409);
-        }
-        return successResponse(existingOrder, 'This payment has already been applied to your order.');
+    const existingOrder = await prisma.order.findFirst({
+      where: { paymentRef: validatedData.paymentReference },
+      include: { items: true, address: true },
+    });
+    if (existingOrder) {
+      if (existingOrder.userId !== authUser.userId) {
+        return errorResponse('This payment reference is already associated with another order.', 409);
       }
+      return successResponse(existingOrder, 'This payment has already been applied to your order.');
     }
 
+    const requestedQuantityByProduct = getRequestedQuantityByProduct(validatedData.items);
     const products = await Promise.all(
       validatedData.items.map(async (item) => {
         const product = await prisma.product.findUnique({
@@ -120,7 +100,11 @@ export async function POST(request: NextRequest) {
           },
         });
 
-        if (!product || !product.inStock || product.stockCount < item.quantity) {
+        if (
+          !product
+          || !product.inStock
+          || product.stockCount < (requestedQuantityByProduct.get(item.productId) || item.quantity)
+        ) {
           throw new OrderValidationError('A selected product is unavailable or has insufficient stock.');
         }
         if (item.size && !product.sizes.includes(item.size)) {
@@ -150,17 +134,14 @@ export async function POST(request: NextRequest) {
       0
     );
     const totals = calculateOrderTotals(subtotal);
-    let paymentReference: string | undefined;
-    if (validatedData.paymentReference) {
-      const transaction = await verifyPaystackTransaction(validatedData.paymentReference);
-      if (!matchesPaystackPayment(transaction, totals.total, currentUser.email)) {
-        return errorResponse(
-          'The verified payment amount, currency, or customer does not match this order.',
-          409
-        );
-      }
-      paymentReference = transaction.reference;
+    const transaction = await verifyPaystackTransaction(validatedData.paymentReference);
+    if (!matchesPaystackPayment(transaction, totals.total, currentUser.email)) {
+      return errorResponse(
+        'The verified payment amount, currency, or customer does not match this order.',
+        409
+      );
     }
+    const paymentReference = transaction.reference;
 
     const orderNumber = `ORD-${Date.now()}-${nanoid(6).toUpperCase()}`;
     const order = await prisma.$transaction(async (transaction) => {
@@ -176,16 +157,14 @@ export async function POST(request: NextRequest) {
         userId: authUser.userId,
         addressId: address.id,
         ...totals,
-        paymentMethod: paymentReference ? 'paystack' : 'card',
+        paymentMethod: 'paystack',
         items: {
           create: products,
         },
       };
 
-      if (paymentReference) {
-        orderData.paymentRef = paymentReference;
-        orderData.paymentStatus = 'PAID';
-      }
+      orderData.paymentRef = paymentReference;
+      orderData.paymentStatus = 'PAID';
 
       return transaction.order.create({
         data: orderData,

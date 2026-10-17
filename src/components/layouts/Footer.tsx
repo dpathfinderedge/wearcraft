@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { Mail, Phone, MapPin } from 'lucide-react';
+import { Mail, MapPin } from 'lucide-react';
 
 export const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
@@ -19,6 +19,7 @@ export const Footer: React.FC = () => {
       { name: 'Blog', href: '/blog' },
     ],
     support: [
+      { name: 'Frequently Asked Questions', href: '/#faq' },
       { name: 'Help Center', href: '/help' },
       { name: 'Shipping Info', href: '/shipping' },
       { name: 'Returns', href: '/returns' },
@@ -30,6 +31,7 @@ export const Footer: React.FC = () => {
       { name: 'Cookie Policy', href: '/cookies' },
     ],
   };
+  const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim();
 
   return (
     <footer className="mt-20 border-t border-line bg-[#eeede7]">
@@ -43,18 +45,14 @@ export const Footer: React.FC = () => {
               Thoughtful wardrobe essentials for everyday life, selected with a slower and more considered eye.
             </p>
             <div className="mt-7 space-y-3">
-              <div className="flex items-center text-sm text-muted">
-                <Mail size={16} className="mr-3 text-olive" strokeWidth={1.5} />
-                <a href="mailto:hello@wearcraft.com" className="transition-colors hover:text-ink">
-                  hello@wearcraft.com
-                </a>
-              </div>
-              <div className="flex items-center text-sm text-muted">
-                <Phone size={16} className="mr-3 text-olive" strokeWidth={1.5} />
-                <a href="tel:+1234567890" className="transition-colors hover:text-ink">
-                  +1 (234) 567-890
-                </a>
-              </div>
+              {contactEmail && (
+                <div className="flex items-center text-sm text-muted">
+                  <Mail size={16} className="mr-3 text-olive" strokeWidth={1.5} />
+                  <a href={`mailto:${contactEmail}`} className="transition-colors hover:text-ink">
+                    {contactEmail}
+                  </a>
+                </div>
+              )}
               <div className="flex items-center text-sm text-muted">
                 <MapPin size={16} className="mr-3 text-olive" strokeWidth={1.5} />
                 <span>Lagos, Nigeria</span>
@@ -122,7 +120,7 @@ export const Footer: React.FC = () => {
           <p className="text-sm text-muted">
             © {currentYear} WearCraft. All rights reserved.
           </p>
-          <div className="mt-4 flex gap-6 md:mt-0">
+          <div className="mt-4 flex flex-wrap justify-center gap-x-6 gap-y-3 md:mt-0">
             {footerLinks.legal.map((link) => (
               <Link
                 key={link.name}

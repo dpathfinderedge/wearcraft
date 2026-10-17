@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { Minus, Plus, Trash2 } from 'lucide-react';
 import { CartItem as CartItemType } from '@/types/cart';
 import { formatPrice } from '@/lib/utils';
+import { MAX_ORDER_ITEM_QUANTITY } from '@/lib/order-limits';
 import { useCartStore } from '@/store';
 
 interface CartItemProps {
@@ -80,14 +81,19 @@ export const CartItem: React.FC<CartItemProps> = ({ item }) => {
             >
               <Minus size={14} />
             </button>
-            <span className="w-7 text-center text-sm font-medium text-ink">
+            <span
+              className="w-7 text-center text-sm font-medium text-ink"
+              aria-live="polite"
+              aria-label={`Quantity: ${item.quantity}`}
+            >
               {item.quantity}
             </span>
             <button
               onClick={() => handleQuantityChange(item.quantity + 1)}
-                type="button"
-                aria-label={`Increase quantity of ${item.product.name}`}
-                className="rounded-md p-2 text-muted transition-colors hover:bg-paper hover:text-ink"
+              type="button"
+              aria-label={`Increase quantity of ${item.product.name}`}
+              disabled={item.quantity >= MAX_ORDER_ITEM_QUANTITY}
+              className="rounded-md p-2 text-muted transition-colors hover:bg-paper hover:text-ink disabled:cursor-not-allowed disabled:opacity-40"
             >
               <Plus size={14} />
             </button>

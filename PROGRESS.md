@@ -144,6 +144,18 @@ WearCraft is a Next.js fashion e-commerce application with authenticated account
 - Validate product review lookup and submission values, rejecting duplicate or unknown lookup filters.
 - Return a client error for malformed multipart upload requests rather than treating request parsing failures as server errors.
 - Keep product rating/count aggregates limited to published reviews, matching the public product review feed.
+- Require a PayStack reference and reject client-controlled order fields when creating orders.
+- Disable simulated unpaid checkout orders; checkout now remains unavailable until both the public and server PayStack keys are configured.
+- Use same-origin API requests by default so deployment does not depend on knowing the production URL at build time.
+- Enforce the same per-line quantity limit in the cart as the order API and sum stock demand across product variants in each order request.
+
+### Accessibility and interaction polish
+
+- Give product quantity controls a labelled group and live quantity value for assistive technology.
+- Disable quantity controls at their valid bounds and keep cart quantities within the API's per-item limit.
+- Keep a single main landmark in storefront layouts.
+- Restore the contact and newsletter forms without simulated success states; contact prepares an email only when a support address is configured, and newsletter addresses are not stored until signup is connected.
+- Restore the planned company, support, and legal footer destinations while keeping unverified phone details out of the site.
 
 ### Storefront data consistency
 
@@ -171,19 +183,19 @@ The storefront will be redesigned into a more modern, distinctive, and aesthetic
 ## Validation
 
 - TypeScript passes for application source using a project config that excludes malformed generated `.next` route types.
-- ESLint passes with 0 errors.
+- Focused ESLint passes with 0 errors for the changed API, checkout, product, and cart files.
 - Production build passes with `NEXT_DISABLE_FONT_DOWNLOAD=1 npm run build`.
 - `baseline-browser-mapping@2.11.27` is installed directly as a development dependency to keep Baseline browser data current.
-- The build generates 25 application and API routes.
+- The production build generates the storefront and API routes, including PayStack availability status.
 - Storefront product and cart imagery use `next/image`; no raw `<img>` elements remain under `src/`.
 - No source comments remain in `src/` or `prisma/`.
 - No test-account credentials or development-only test-route references remain.
-- `npm test` passes 49 checks covering account validation, API error responses, product and review validation, PayStack verification and webhooks, JWT secret validation, and wishlist request validation.
+- `npm test` passes 54 checks covering account validation, API error responses, order and payment configuration, product and review validation, PayStack verification and webhooks, JWT secret validation, and wishlist request validation.
 - Completed a PayStack test-mode checkout; verified the provider transaction, created one paid order, confirmed repeated signed webhook delivery is idempotent, and confirmed a mismatched amount is rejected.
 - PayStack hardening changes passed TypeScript, focused ESLint, and Prisma schema validation.
 - Verified there were no duplicate payment references before adding the database unique constraint; applied the constraint to the configured local database.
 - Prisma Client regeneration reported a Windows file-lock (`EPERM`) while the development server was using the generated engine.
-- The production build for the PayStack hardening changes has not been verified.
+- The current production build passes with generated routes, including the payment-availability endpoint.
 
 ## Pending Tasks
 
@@ -195,8 +207,10 @@ The storefront will be redesigned into a more modern, distinctive, and aesthetic
 ### Product features
 
 - Configure a durable retry queue before relying on transactional email at production volume.
+- Connect newsletter signup to a real service and configure a verified public support email before accepting customer enquiries.
+- Implement the planned about, careers, blog, help, shipping, returns, size-guide, privacy, terms, and cookie-policy pages; publish accurate policy and fulfilment information before accepting customers.
 
 ### Production hardening
 
-- Add authorization and ownership checks across all profile, address, order, review, wishlist, and admin operations.
+- Inventory availability is checked against requested quantities, but stock is not reserved or decremented atomically when orders are paid. Define and implement a reservation/release or oversell/refund workflow before accepting live orders.
 - Review responsive and accessibility behavior across the complete shopping flow.

@@ -31,7 +31,7 @@ export function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   return (
-    <section className="border-t border-line bg-white py-16 md:py-24">
+    <section id="faq" className="border-t border-line bg-white py-16 md:py-24">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 md:grid-cols-[0.8fr_1.2fr] lg:px-8">
         <div>
           <p className="mb-3 text-xs uppercase tracking-[0.2em] text-brown">Need to know</p>

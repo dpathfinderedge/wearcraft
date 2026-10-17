@@ -1,26 +1,33 @@
 'use client';
 
 import { FormEvent, useState } from 'react';
-import { Mail, MapPin, Phone } from 'lucide-react';
-import { Button, Input, useToast } from '@/components/ui';
+import { Mail, MapPin } from 'lucide-react';
+import { Button, Input } from '@/components/ui';
 
 export default function ContactPage() {
-  const { showToast } = useToast();
-  const [isSending, setIsSending] = useState(false);
+  const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim();
+  const [submissionMessage, setSubmissionMessage] = useState('');
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const form = event.currentTarget;
-    setIsSending(true);
-    window.setTimeout(() => {
-      setIsSending(false);
-      form.reset();
-      showToast('Thanks for reaching out. We will be in touch soon.', 'success');
-    }, 700);
+    if (!contactEmail) {
+      setSubmissionMessage('The contact form is not connected yet. Please check back soon.');
+      return;
+    }
+
+    const formData = new FormData(event.currentTarget);
+    const subject = String(formData.get('subject') || 'WearCraft enquiry');
+    const message = [
+      `Name: ${String(formData.get('name') || '')}`,
+      `Email: ${String(formData.get('email') || '')}`,
+      '',
+      String(formData.get('message') || ''),
+    ].join('\n');
+    window.location.href = `mailto:${contactEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
   };
 
   return (
-    <main className="min-h-screen bg-paper">
+    <div className="min-h-screen bg-paper">
       <section className="border-b border-line bg-[#eeede7]">
         <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 md:py-24 lg:px-8">
           <p className="mb-3 text-xs uppercase tracking-[0.2em] text-brown">Get in touch</p>
@@ -33,48 +40,72 @@ export default function ContactPage() {
         <div>
           <h2 className="text-2xl font-light text-ink">Contact WearCraft</h2>
           <p className="mt-4 max-w-sm text-sm leading-6 text-muted">
-            Questions about an order, sizing, or a future collection? Send us a note and our team will reply within one business day.
+            Questions about an order, sizing, or a future collection? {contactEmail
+              ? 'Use the form to prepare an email for our team.'
+              : 'Our contact details are being prepared.'}
           </p>
           <div className="mt-8 space-y-5 text-sm text-muted">
-            <a href="mailto:hello@wearcraft.com" className="flex items-center gap-3 transition-colors hover:text-ink">
-              <Mail size={18} className="text-brown" />
-              hello@wearcraft.com
-            </a>
-            <a href="tel:+1234567890" className="flex items-center gap-3 transition-colors hover:text-ink">
-              <Phone size={18} className="text-brown" />
-              +1 (234) 567-890
-            </a>
+            {contactEmail && (
+              <a href={`mailto:${contactEmail}`} className="flex items-center gap-3 transition-colors hover:text-ink">
+                <Mail size={18} className="text-brown" aria-hidden="true" />
+                {contactEmail}
+              </a>
+            )}
             <span className="flex items-center gap-3">
-              <MapPin size={18} className="text-brown" />
+              <MapPin size={18} className="text-brown" aria-hidden="true" />
               Lagos, Nigeria
             </span>
           </div>
         </div>
         <form onSubmit={handleSubmit} className="rounded-sm border border-line bg-white p-6 md:p-8">
           <div className="grid gap-5 sm:grid-cols-2">
-            <Input label="Name" name="name" required autoComplete="name" />
-            <Input label="Email" name="email" type="email" required autoComplete="email" />
+            <div>
+              <label htmlFor="contact-name" className="mb-2 block text-xs font-medium uppercase tracking-[0.1em] text-muted">
+                Name<span className="ml-1 text-clay" aria-hidden="true">*</span>
+              </label>
+              <Input id="contact-name" name="name" required autoComplete="name" maxLength={100} />
+            </div>
+            <div>
+              <label htmlFor="contact-email" className="mb-2 block text-xs font-medium uppercase tracking-[0.1em] text-muted">
+                Email<span className="ml-1 text-clay" aria-hidden="true">*</span>
+              </label>
+              <Input id="contact-email" name="email" type="email" required autoComplete="email" maxLength={254} />
+            </div>
           </div>
           <div className="mt-5">
-            <Input label="Subject" name="subject" required />
+            <label htmlFor="contact-subject" className="mb-2 block text-xs font-medium uppercase tracking-[0.1em] text-muted">
+              Subject<span className="ml-1 text-clay" aria-hidden="true">*</span>
+            </label>
+            <Input id="contact-subject" name="subject" required maxLength={150} />
           </div>
           <div className="mt-5">
             <label htmlFor="message" className="mb-2 block text-xs font-medium uppercase tracking-[0.1em] text-muted">
-              Message
+              Message<span className="ml-1 text-clay" aria-hidden="true">*</span>
             </label>
             <textarea
               id="message"
               name="message"
               required
+              maxLength={4000}
               rows={6}
               className="w-full resize-y border border-line bg-white px-3.5 py-3 text-sm text-ink outline-none transition-colors placeholder:text-gray-400 focus:border-olive focus:ring-1 focus:ring-olive"
             />
           </div>
-          <Button type="submit" size="lg" isLoading={isSending} className="mt-6 w-full sm:w-auto">
+          {submissionMessage && (
+            <p role="status" className="mt-4 text-sm text-clay">
+              {submissionMessage}
+            </p>
+          )}
+          <Button type="submit" size="lg" className="mt-6 w-full sm:w-auto">
             Send message
           </Button>
+          {!contactEmail && (
+            <p className="mt-3 text-xs leading-5 text-muted">
+              The form cannot send messages until a support email address is configured.
+            </p>
+          )}
         </form>
       </section>
-    </main>
+    </div>
   );
 }
