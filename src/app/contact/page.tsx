@@ -1,26 +1,11 @@
-'use client';
-
-import { FormEvent, useState } from 'react';
-import { Mail, MapPin, Phone } from 'lucide-react';
-import { Button, Input, useToast } from '@/components/ui';
+import Link from 'next/link';
+import { Mail, MapPin } from 'lucide-react';
 
 export default function ContactPage() {
-  const { showToast } = useToast();
-  const [isSending, setIsSending] = useState(false);
-
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const form = event.currentTarget;
-    setIsSending(true);
-    window.setTimeout(() => {
-      setIsSending(false);
-      form.reset();
-      showToast('Thanks for reaching out. We will be in touch soon.', 'success');
-    }, 700);
-  };
+  const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim();
 
   return (
-    <main className="min-h-screen bg-paper">
+    <div className="min-h-screen bg-paper">
       <section className="border-b border-line bg-[#eeede7]">
         <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 md:py-24 lg:px-8">
           <p className="mb-3 text-xs uppercase tracking-[0.2em] text-brown">Get in touch</p>
@@ -33,48 +18,45 @@ export default function ContactPage() {
         <div>
           <h2 className="text-2xl font-light text-ink">Contact WearCraft</h2>
           <p className="mt-4 max-w-sm text-sm leading-6 text-muted">
-            Questions about an order, sizing, or a future collection? Send us a note and our team will reply within one business day.
+            Questions about an order, sizing, or a future collection? Our support contact details will appear here as soon as they are configured.
           </p>
           <div className="mt-8 space-y-5 text-sm text-muted">
-            <a href="mailto:hello@wearcraft.com" className="flex items-center gap-3 transition-colors hover:text-ink">
-              <Mail size={18} className="text-brown" />
-              hello@wearcraft.com
-            </a>
-            <a href="tel:+1234567890" className="flex items-center gap-3 transition-colors hover:text-ink">
-              <Phone size={18} className="text-brown" />
-              +1 (234) 567-890
-            </a>
             <span className="flex items-center gap-3">
               <MapPin size={18} className="text-brown" />
               Lagos, Nigeria
             </span>
           </div>
         </div>
-        <form onSubmit={handleSubmit} className="rounded-sm border border-line bg-white p-6 md:p-8">
-          <div className="grid gap-5 sm:grid-cols-2">
-            <Input label="Name" name="name" required autoComplete="name" />
-            <Input label="Email" name="email" type="email" required autoComplete="email" />
-          </div>
-          <div className="mt-5">
-            <Input label="Subject" name="subject" required />
-          </div>
-          <div className="mt-5">
-            <label htmlFor="message" className="mb-2 block text-xs font-medium uppercase tracking-[0.1em] text-muted">
-              Message
-            </label>
-            <textarea
-              id="message"
-              name="message"
-              required
-              rows={6}
-              className="w-full resize-y border border-line bg-white px-3.5 py-3 text-sm text-ink outline-none transition-colors placeholder:text-gray-400 focus:border-olive focus:ring-1 focus:ring-olive"
-            />
-          </div>
-          <Button type="submit" size="lg" isLoading={isSending} className="mt-6 w-full sm:w-auto">
-            Send message
-          </Button>
-        </form>
+        <div className="rounded-sm border border-line bg-white p-6 md:p-8">
+          <h2 className="text-2xl font-light text-ink">Customer care</h2>
+          {contactEmail ? (
+            <>
+              <p className="mt-3 text-sm leading-6 text-muted">
+                For questions about an order, sizing, or a future collection, email our team.
+              </p>
+              <a
+                href={`mailto:${contactEmail}`}
+                className="mt-6 inline-flex min-h-11 items-center gap-3 text-sm font-medium text-ink underline decoration-line underline-offset-4 transition-colors hover:text-brown"
+              >
+                <Mail size={18} aria-hidden="true" />
+                {contactEmail}
+              </a>
+            </>
+          ) : (
+            <>
+              <p role="status" className="mt-3 text-sm leading-6 text-muted">
+                Our support contact details are being prepared. Please check back soon.
+              </p>
+            </>
+          )}
+          <Link
+            href="/#faq"
+            className="mt-6 inline-flex min-h-11 items-center text-sm font-medium text-ink underline decoration-line underline-offset-4 transition-colors hover:text-brown"
+          >
+            Read our FAQs
+          </Link>
+        </div>
       </section>
-    </main>
+    </div>
   );
 }

@@ -26,20 +26,31 @@ export default function CheckoutPage() {
   const [shippingAddress, setShippingAddress] = useState<AddressInput | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [paystackLoaded, setPaystackLoaded] = useState(false);
+  const [paymentAvailable, setPaymentAvailable] = useState(false);
   const [shippingSaved, setShippingSaved] = useState(false);
 
   const summary = getCartSummary();
   const paystackPublicKey = getPaystackPublicKey();
-  const hasValidPaystackKey = Boolean(
-    paystackPublicKey && paystackPublicKey !== 'pk_test_default_key'
-  );
+  const hasValidPaystackKey = paymentAvailable && Boolean(paystackPublicKey);
   const amountInKobo = convertToKobo(summary.total);
   const handlePaystackLoad = useCallback(() => {
     setPaystackLoaded(true);
   }, []);
   const handlePaystackError = useCallback(() => {
-    showToast('Unable to load PayStack. Demo checkout will still work.', 'warning');
+    showToast('Unable to load PayStack. Please try again later.', 'error');
   }, [showToast]);
+
+  useEffect(() => {
+    let cancelled = false;
+    void apiClient.getPaystackStatus().then((response) => {
+      if (!cancelled && response.success && response.data?.available) {
+        setPaymentAvailable(true);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     if (!hasCheckedAuth) {
@@ -63,7 +74,7 @@ export default function CheckoutPage() {
     showToast('Address saved successfully. You can now complete payment.', 'success');
   };
 
-  const createOrder = async (paymentReference?: string) => {
+  const createOrder = async (paymentReference: string) => {
     if (!user || !shippingAddress) {
       return { success: false, error: 'Missing user or shipping address' };
     }
@@ -116,6 +127,11 @@ export default function CheckoutPage() {
   };
 
   const handlePayment = async () => {
+    if (!hasValidPaystackKey) {
+      showToast('Checkout is temporarily unavailable while payment is being configured.', 'error');
+      return;
+    }
+
     if (!shippingAddress) {
       showToast('Please save your shipping address before paying.', 'error');
       return;
@@ -127,40 +143,24 @@ export default function CheckoutPage() {
       return;
     }
 
-    if (hasValidPaystackKey) {
-      if (!paystackLoaded || !window.PaystackPop) {
-        showToast('Payment system is loading, please wait.', 'warning');
-        return;
-      }
-
-      initializePaystackPayment({
-        publicKey: paystackPublicKey,
-        email: user.email,
-        amount: amountInKobo,
-        currency: 'NGN',
-        onClose: () => {
-          setIsProcessing(false);
-          showToast('Payment window closed. You can retry when ready.', 'warning');
-        },
-        onSuccess: (response: PaystackResponse) => {
-          void handlePaystackSuccess(response);
-        },
-      });
-    } else {
-      setIsProcessing(true);
-      const orderResponse = await createOrder();
-      if (!orderResponse.success || !orderResponse.data) {
-        showToast(orderResponse.error || 'Failed to place order', 'error');
-        setIsProcessing(false);
-        return;
-      }
-
-      if (orderResponse.message?.includes('could not be sent')) {
-        showToast(orderResponse.message, 'warning');
-      }
-      clearCart();
-      router.push(`/order-confirmation?orderId=${orderResponse.data.id}`);
+    if (!paystackLoaded || !window.PaystackPop) {
+      showToast('Payment system is loading, please wait.', 'warning');
+      return;
     }
+
+    initializePaystackPayment({
+      publicKey: paystackPublicKey,
+      email: user.email,
+      amount: amountInKobo,
+      currency: 'NGN',
+      onClose: () => {
+        setIsProcessing(false);
+        showToast('Payment window closed. You can retry when ready.', 'warning');
+      },
+      onSuccess: (response: PaystackResponse) => {
+        void handlePaystackSuccess(response);
+      },
+    });
   };
 
   if (items.length === 0) {
@@ -180,8 +180,8 @@ export default function CheckoutPage() {
           </div>
 
           {!hasValidPaystackKey && (
-            <div className="mb-6 rounded-md border border-[#d8cbbd] bg-[#f5efe9] p-4 text-sm text-ink">
-              <strong>Demo Mode:</strong> PayStack is not configured. You can still place a test order.
+            <div role="alert" className="mb-6 rounded-md border border-[#d8cbbd] bg-[#f5efe9] p-4 text-sm text-ink">
+              Checkout is temporarily unavailable while secure payment is being configured. Your cart is unchanged.
             </div>
           )}
 
@@ -214,12 +214,12 @@ export default function CheckoutPage() {
                   </div>
                   <div>
                     <p className="font-medium text-ink">
-                      {hasValidPaystackKey ? 'PayStack Checkout' : 'Test Checkout'}
+                      {hasValidPaystackKey ? 'PayStack Checkout' : 'Secure payment unavailable'}
                     </p>
                     <p className="text-sm leading-6 text-muted">
                       {hasValidPaystackKey
                         ? 'Secure payment via PayStack. Your card information stays encrypted.'
-                        : 'Demo sales mode: payment is simulated for testing without a PayStack key.'}
+                        : 'Payment options will be available once checkout configuration is complete.'}
                     </p>
                   </div>
                 </div>
@@ -249,10 +249,10 @@ export default function CheckoutPage() {
                   size="lg"
                   className="w-full"
                   onClick={handlePayment}
-                  disabled={isProcessing || !shippingSaved}
+                  disabled={isProcessing || !shippingSaved || !hasValidPaystackKey}
                   isLoading={isProcessing}
                 >
-                  {isProcessing ? 'Processing...' : hasValidPaystackKey ? `Pay ${summary.total.toFixed(2)}` : 'Place Order'}
+                  {isProcessing ? 'Processing...' : hasValidPaystackKey ? `Pay ${summary.total.toFixed(2)}` : 'Payment unavailable'}
                 </Button>
 
                 <p className="text-center text-xs leading-5 text-muted">

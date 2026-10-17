@@ -1,65 +1,26 @@
-'use client';
+import Link from 'next/link';
+import { ArrowUpRight } from 'lucide-react';
 
-import React, { useState } from 'react';
-import { Button } from '@/components/ui';
-import { useToast } from '@/components/ui';
-
-export const Newsletter: React.FC = () => {
-  const [email, setEmail] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const { showToast } = useToast();
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!email) {
-      showToast('Please enter your email address', 'error');
-      return;
-    }
-
-    setIsLoading(true);
-    setTimeout(() => {
-      showToast('Successfully subscribed to newsletter!', 'success');
-      setEmail('');
-      setIsLoading(false);
-    }, 1000);
-  };
-
+export function Newsletter() {
   return (
-    <section className="bg-[#80533f] py-16 text-white md:py-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="max-w-2xl mx-auto text-center">
-          <p className="mb-3 text-xs uppercase tracking-[0.2em] text-white">The journal</p>
-          <h2 className="mb-4 text-3xl font-light text-white md:text-4xl">A little more considered.</h2>
-          <p className="mb-8 text-white">
-            Subscribe to get updates on new arrivals, exclusive offers, and style inspiration.
-          </p>
-
-          <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
-              className="flex-1 rounded-md border-0 bg-white px-4 py-3 text-ink outline-none focus:ring-2 focus:ring-white"
-              disabled={isLoading}
-            />
-            <Button
-              type="submit"
-              variant="primary"
-              size="lg"
-              isLoading={isLoading}
-              className="bg-[#20211f] text-white hover:bg-[#3f4a3d]"
-            >
-              Subscribe
-            </Button>
-          </form>
-
-          <p className="mt-4 text-xs text-white">
-            By subscribing, you agree to our Privacy Policy and consent to receive updates.
+    <section className="border-t border-line bg-[#eeede7] py-14 md:py-18">
+      <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 sm:px-6 md:flex-row md:items-end md:justify-between lg:px-8">
+        <div>
+          <p className="mb-3 text-xs uppercase tracking-[0.2em] text-brown">WearCraft / Collection</p>
+          <h2 className="max-w-xl text-3xl font-light tracking-[-0.03em] text-ink md:text-4xl">
+            A little more considered.
+          </h2>
+          <p className="mt-3 max-w-xl text-sm leading-6 text-muted">
+            Explore pieces selected for everyday wear and a more thoughtful wardrobe.
           </p>
         </div>
+        <Link
+          href="/shop"
+          className="inline-flex min-h-11 items-center gap-2 self-start text-sm font-medium text-ink transition-colors hover:text-brown md:self-auto"
+        >
+          Browse the collection <ArrowUpRight size={18} aria-hidden="true" />
+        </Link>
       </div>
     </section>
   );
-};
+}

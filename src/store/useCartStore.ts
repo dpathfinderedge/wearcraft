@@ -3,6 +3,7 @@ import { persist } from 'zustand/middleware';
 import { CartItem, CartSummary } from '@/types/cart';
 import { Product } from '@/types/product';
 import { calculateTax, calculateShipping } from '@/lib/utils';
+import { capOrderItemQuantity } from '@/lib/order-limits';
 
 interface CartStore {
   items: CartItem[];
@@ -34,13 +35,13 @@ export const useCartStore = create<CartStore>()(
             const newItems = [...state.items];
             newItems[existingItemIndex] = {
               ...newItems[existingItemIndex],
-              quantity: newItems[existingItemIndex].quantity + quantity,
+              quantity: capOrderItemQuantity(newItems[existingItemIndex].quantity + quantity),
             };
             return { items: newItems };
           } else {
             const newItem: CartItem = {
               product,
-              quantity,
+              quantity: capOrderItemQuantity(quantity),
               selectedSize,
               selectedColor,
               addedAt: new Date().toISOString(),
@@ -74,7 +75,7 @@ export const useCartStore = create<CartStore>()(
             item.product.id === productId &&
             item.selectedSize === selectedSize &&
             item.selectedColor === selectedColor
-              ? { ...item, quantity }
+              ? { ...item, quantity: capOrderItemQuantity(quantity) }
               : item
           ),
         }));

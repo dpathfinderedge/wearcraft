@@ -10,6 +10,7 @@ import { ColorSelector, ProductReviews, SizeSelector } from '@/components/produc
 import { Button, useToast } from '@/components/ui';
 import { useAuthStore, useCartStore, useWishlistStore } from '@/store';
 import { calculateDiscount, formatPrice } from '@/lib/utils';
+import { MAX_ORDER_ITEM_QUANTITY } from '@/lib/order-limits';
 import { apiClient } from '@/lib/api-client';
 import type { Product } from '@/types/product';
 
@@ -178,22 +179,34 @@ export default function ProductDetailPage() {
             </div>
 
             <div className="mt-8">
-              <label htmlFor="quantity" className="mb-3 block text-sm font-medium text-ink">Quantity</label>
-              <div className="flex w-fit items-center rounded-md border border-line bg-white">
+              <p id="quantity-label" className="mb-3 block text-sm font-medium text-ink">Quantity</p>
+              <div
+                role="group"
+                aria-labelledby="quantity-label"
+                className="flex w-fit items-center rounded-md border border-line bg-white"
+              >
                 <button
                   type="button"
                   aria-label="Decrease quantity"
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                  disabled={quantity <= 1}
                   className="p-3 text-muted transition-colors hover:text-ink"
                 >
                   <Minus size={16} />
                 </button>
-                <span id="quantity" aria-live="polite" className="min-w-10 text-center text-sm font-medium text-ink">{quantity}</span>
+                <span
+                  aria-live="polite"
+                  aria-label={`Quantity: ${quantity}`}
+                  className="min-w-10 text-center text-sm font-medium text-ink"
+                >
+                  {quantity}
+                </span>
                 <button
                   type="button"
                   aria-label="Increase quantity"
-                  onClick={() => setQuantity(quantity + 1)}
-                  className="p-3 text-muted transition-colors hover:text-ink"
+                  onClick={() => setQuantity(Math.min(MAX_ORDER_ITEM_QUANTITY, quantity + 1))}
+                  disabled={quantity >= MAX_ORDER_ITEM_QUANTITY}
+                  className="p-3 text-muted transition-colors hover:text-ink disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   <Plus size={16} />
                 </button>

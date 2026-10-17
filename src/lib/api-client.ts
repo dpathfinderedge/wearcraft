@@ -169,12 +169,6 @@ export interface AdminAnalytics {
 export type AdminProductInput = Omit<AdminProduct, 'id' | 'rating' | 'reviewCount' | 'createdAt' | 'updatedAt' | '_count'>;
 
 class ApiClient {
-  private baseUrl: string;
-
-  constructor() {
-    this.baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-  }
-
   private async request<T>(
     endpoint: string,
     options?: RequestInit
@@ -183,7 +177,7 @@ class ApiClient {
     const timeout = setTimeout(() => controller.abort(), 15000);
 
     try {
-      const response = await fetch(`${this.baseUrl}${endpoint}`, {
+      const response = await fetch(endpoint, {
         ...options,
         signal: options?.signal || controller.signal,
         headers: {
@@ -317,7 +311,7 @@ class ApiClient {
       country: string;
       phone: string;
     };
-    paymentReference?: string;
+    paymentReference: string;
   }): Promise<ApiResponse<ApiOrder>> {
     return this.request<ApiOrder>('/api/orders', {
       method: 'POST',
@@ -340,6 +334,10 @@ class ApiClient {
       method: 'POST',
       body: JSON.stringify({ reference }),
     });
+  }
+
+  async getPaystackStatus(): Promise<ApiResponse<{ available: boolean }>> {
+    return this.request<{ available: boolean }>('/api/paystack/status');
   }
 
   async getOrders(): Promise<ApiResponse<ApiOrder[]>> {

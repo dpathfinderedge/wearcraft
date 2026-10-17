@@ -72,5 +72,5 @@ export const convertToKobo = (amount: number): number => {
 
 
 export const getPaystackPublicKey = (): string => {
-  return process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY || 'pk_test_default_key';
+  return process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY || '';
 };
