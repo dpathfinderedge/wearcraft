@@ -154,8 +154,8 @@ WearCraft is a Next.js fashion e-commerce application with authenticated account
 - Give product quantity controls a labelled group and live quantity value for assistive technology.
 - Disable quantity controls at their valid bounds and keep cart quantities within the API's per-item limit.
 - Keep a single main landmark in storefront layouts.
-- Remove simulated contact and newsletter success states; contact now uses a configured support email, and the collection callout remains useful without a fake subscription.
-- Replace footer links to unimplemented routes with working shop, FAQ, and contact destinations; avoid publishing placeholder phone and email details.
+- Restore the contact and newsletter forms without simulated success states; contact prepares an email only when a support address is configured, and newsletter addresses are not stored until signup is connected.
+- Restore the planned company, support, and legal footer destinations while keeping unverified phone details out of the site.
 
 ### Storefront data consistency
 
@@ -207,7 +207,8 @@ The storefront will be redesigned into a more modern, distinctive, and aesthetic
 ### Product features
 
 - Configure a durable retry queue before relying on transactional email at production volume.
-- Set a verified public support email and publish accurate privacy, terms, shipping, and returns information before accepting customers.
+- Connect newsletter signup to a real service and configure a verified public support email before accepting customer enquiries.
+- Implement the planned about, careers, blog, help, shipping, returns, size-guide, privacy, terms, and cookie-policy pages; publish accurate policy and fulfilment information before accepting customers.
 
 ### Production hardening
 
