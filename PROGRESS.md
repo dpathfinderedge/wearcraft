@@ -66,6 +66,7 @@ WearCraft is a Next.js fashion e-commerce application with authenticated account
 - Added automatic and manual hero imagery transitions for women's, men's, and unisex edits.
 - Added Contact navigation and a dedicated Contact page.
 - Added a shared WearCraft wordmark and monogram across the storefront, account, and admin shells, with a matching SVG app icon.
+- Added a baseline Prisma migration and separate pooled application/direct migration connection configuration for Neon PostgreSQL.
 - Refined shop search, filters, product cards, badges, ratings, spacing, and image rendering.
 - Redesigned product detail pages with optimized imagery, thumbnail navigation, responsive purchase controls, wishlist actions, and product information.
 - Refined cart and checkout layouts, empty states, quantity controls, order summaries, address sections, payment states, and responsive spacing.
@@ -203,7 +204,8 @@ The storefront will be redesigned into a more modern, distinctive, and aesthetic
 ### Immediate correctness and validation
 
 - Production settings are not available in this workspace: local PayStack keys are test-mode, the app URL is localhost, and both configured databases are local. Confirm live credentials, public app URL, and webhook endpoint in the hosting environment before deployment.
-- Apply the payment-reference unique constraint to production before deploying the application changes.
+- Configure Neon pooled `DATABASE_URL` and direct `DATABASE_URL_UNPOOLED`, then review and apply the initial schema migration to the empty production database before deployment.
+- Apply the payment-reference unique constraint to any existing production database before deploying the application changes.
 
 ### Product features
 

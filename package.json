@@ -4,13 +4,14 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npm run db:generate && next build",
     "start": "next start",
     "test": "tsx --test src/lib/account-validation.test.ts src/lib/api-response.test.ts src/lib/paystack-server.test.ts src/lib/paystack-webhook.test.ts src/lib/jwt-secret.test.ts src/lib/wishlist-input.test.ts src/lib/product-query.test.ts src/lib/review-validation.test.ts src/lib/order-validation.test.ts src/lib/payment-config.test.ts src/lib/order-limits.test.ts",
     "lint": "eslint",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
+    "db:migrate:deploy": "prisma migrate deploy",
     "db:studio": "prisma studio",
     "db:seed": "tsx prisma/seed.ts",
     "db:reset": "prisma migrate reset && npm run db:seed"
