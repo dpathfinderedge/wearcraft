@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Mail, MapPin } from 'lucide-react';
+import { BrandLogo } from '@/components/brand/BrandLogo';
 
 export const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
@@ -38,9 +39,7 @@ export const Footer: React.FC = () => {
       <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
         <div className="mb-12 grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-5">
           <div className="lg:col-span-2">
-            <Link href="/" className="text-2xl font-semibold tracking-[-0.04em] text-ink">
-              Wear<span className="text-olive">Craft</span>
-            </Link>
+            <BrandLogo size="lg" />
             <p className="mt-5 max-w-md text-sm leading-6 text-muted">
               Thoughtful wardrobe essentials for everyday life, selected with a slower and more considered eye.
             </p>
