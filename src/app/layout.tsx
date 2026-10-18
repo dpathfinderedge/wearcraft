@@ -5,8 +5,8 @@ import { AuthProvider } from '@/components/providers/AuthProvider';
 import { ToastProvider } from '@/components/ui';
 
 export const metadata: Metadata = {
-  title: 'WearCraft - Premium Clothing Store',
-  description: 'Discover premium fashion pieces crafted for the modern wardrobe',
+  title: 'WearCraft | Thoughtful Wardrobe Essentials',
+  description: 'Thoughtfully selected wardrobe essentials for everyday life.',
 }
 
 export default function RootLayout({

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Heart, ShoppingCart, User, Menu, X } from 'lucide-react';
 import { useCartStore, useAuthStore, useWishlistStore } from '@/store';
+import { BrandLogo } from '@/components/brand/BrandLogo';
 
 export const Navbar: React.FC = () => {
   const router = useRouter();
@@ -67,11 +68,7 @@ export const Navbar: React.FC = () => {
     <nav className="sticky top-0 z-40 border-b border-line bg-[#f8f7f3]/95 backdrop-blur">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-[4.5rem] items-center justify-between">
-          <div className="flex items-center">
-            <Link href="/" className="text-xl font-semibold tracking-[-0.04em] text-ink">
-              Wear<span className="text-olive">Craft</span>
-            </Link>
-          </div>
+          <BrandLogo />
 
           <div className="hidden md:flex items-center space-x-8">
             {navigation.map((item) => (
@@ -175,8 +172,8 @@ export const Navbar: React.FC = () => {
         </div>
       </div>
 
-      <div className={`relative left-1/2 w-screen -translate-x-1/2 overflow-hidden border-t border-line bg-white transition-all duration-300 ease-out md:hidden ${mobileMenuOpen ? 'max-h-[32rem] opacity-100' : 'pointer-events-none max-h-0 opacity-0'}`}>
-          <div className="space-y-1 px-4 py-4">
+      <div className={`absolute inset-x-0 top-full overflow-hidden border-t border-line bg-white transition-all duration-300 ease-out md:hidden ${mobileMenuOpen ? 'max-h-[32rem] opacity-100' : 'pointer-events-none max-h-0 opacity-0'}`}>
+          <div className="mx-auto max-w-7xl space-y-1 px-4 py-4 sm:px-6 lg:px-8">
             {navigation.map((item) => (
               <Link
                 key={item.name}

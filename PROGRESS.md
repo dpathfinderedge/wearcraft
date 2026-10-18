@@ -1,6 +1,6 @@
 # WearCraft Development Progress
 
-Updated: 2026-10-06
+Updated: 2026-10-18
 
 ## Current State
 
@@ -65,6 +65,7 @@ WearCraft is a Next.js fashion e-commerce application with authenticated account
 - Redesigned the homepage with stronger hierarchy, FAQ content, newsletter contrast, and responsive editorial sections.
 - Added automatic and manual hero imagery transitions for women's, men's, and unisex edits.
 - Added Contact navigation and a dedicated Contact page.
+- Added a shared WearCraft wordmark and monogram across the storefront, account, and admin shells, with a matching SVG app icon.
 - Refined shop search, filters, product cards, badges, ratings, spacing, and image rendering.
 - Redesigned product detail pages with optimized imagery, thumbnail navigation, responsive purchase controls, wishlist actions, and product information.
 - Refined cart and checkout layouts, empty states, quantity controls, order summaries, address sections, payment states, and responsive spacing.

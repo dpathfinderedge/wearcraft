@@ -9,6 +9,7 @@ import { signupSchema, SignupInput } from '@/lib/validations';
 import { useAuthStore } from '@/store';
 import { Input, Button } from '@/components/ui';
 import { useToast } from '@/components/ui';
+import { BrandLogo } from '@/components/brand/BrandLogo';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -44,9 +45,7 @@ export default function SignupPage() {
         <div className="bg-white rounded-sm border border-gray-200 p-8">
 
           <div className="text-center mb-8">
-            <Link href="/" className="text-2xl font-semibold tracking-tight text-gray-900">
-              WearCraft
-            </Link>
+            <BrandLogo size="lg" className="mx-auto" />
             <h2 className="mt-6 text-2xl font-light text-gray-900">
               Create your account
             </h2>
