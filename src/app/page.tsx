@@ -18,7 +18,7 @@ function toProductCategory(category: string): Product['category'] {
 
 export default async function Home() {
   const databaseProducts = await prisma.product.findMany({
-    where: { featured: true, inStock: true },
+    where: { featured: true },
     orderBy: { createdAt: 'desc' },
     take: 8,
   });

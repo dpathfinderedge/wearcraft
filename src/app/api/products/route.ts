@@ -16,9 +16,7 @@ export async function GET(request: NextRequest) {
       );
     }
     const { category, search, minPrice, maxPrice, size, featured, sort, page, limit } = parsedQuery.data;
-    const where: Prisma.ProductWhereInput = {
-      inStock: true,
-    };
+    const where: Prisma.ProductWhereInput = {};
 
     if (category && category !== 'all') {
       where.category = category;
